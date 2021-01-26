@@ -1,0 +1,22 @@
+DROP VIEW IF EXISTS enr_2018cohort;
+
+CREATE VIEW enr_2018cohort
+AS
+SELECT *
+FROM enrollment enr
+JOIN Dim_School sch
+    ON enr.SchoolCode = sch.SchoolCode
+    AND enr.ReportSchoolYear = sch.AcademicYear
+WHERE  enr.GradeLevelSortOrder = 15 AND enr.GradReqYear = 2018 AND enr.dGraduate = 1 AND sch.dRoadMapRegionFlag = 1;
+
+select count(*) from enr_2018cohort;
+
+DROP VIEW IF EXISTS ghf_cohort_18;
+
+CREATE VIEW ghf_cohort_18
+AS
+SELECT *
+FROM hsCourses 
+WHERE ResearchID IN (
+SELECT DISTINCT ResearchID
+FROM enr_2018cohort);
