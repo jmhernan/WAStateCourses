@@ -3,7 +3,7 @@ DROP VIEW IF EXISTS enr_2017cohort;
 CREATE VIEW enr_2017cohort
 AS
 SELECT *
-FROM enrollment enr
+FROM enrollments enr
 JOIN Dim_School sch
     ON enr.SchoolCode = sch.SchoolCode
     AND enr.ReportSchoolYear = sch.AcademicYear
