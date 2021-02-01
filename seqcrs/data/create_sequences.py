@@ -29,11 +29,6 @@ df_courses.columns
 
 
 # Create data file of ordered course sequences for cohort 
-# ResearchID,ReportSchoolYear,DistrictName,TermEndDate,Term,
-# GradeLevelWhenCourseTaken,CourseID,CourseTitle,CreditsEarned,
-# StateCourseCode,StateCourseName,dSchoolYear
-single_case = df_courses['ResearchID'] == '#####'
-single_case_df = df_courses[single_case]
 # 1. Order by term 
 # 2. ommit failed courses 
 # 3. pivot wide for sequence by Research ID 
@@ -41,16 +36,15 @@ single_case_df = df_courses[single_case]
 df_sorted = df_courses.sort_values(['CourseTitle'], ascending=True).groupby(['ResearchID'], sort=False)\
     .apply(lambda x: x.sort_values(['TermEndDate'], ascending = True)).reset_index(drop=True)
 
-sub_cases_df = df_sorted[0:100]
-
-failed_courses = sub_cases_df['CreditsEarned'].astype(float) > 0 
-sub_cases_df =  sub_cases_df[failed_courses].reset_index(drop=True)
+failed_courses = df_sorted['CreditsEarned'].astype(float) > 0 
+df_passed_crs =  df_sorted[failed_courses].reset_index(drop=True)
 
 columns = ['ResearchID', 'CourseTitle']
-pivot_df = sub_cases_df[columns]
+pivot_df = df_passed_crs[columns]
 
 # Most promising method so far!
 course_lists = pivot_df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(x)})
+
 # Clean up list of sequences
 # 1. Replace spaces + / with underscores
 # 2. Lower Case
