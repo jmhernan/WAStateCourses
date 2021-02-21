@@ -52,11 +52,15 @@ course_lists = pivot_df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(
 # 2. Lower Case
 course_seq_ls = course_lists['CourseTitle'].to_list() 
 test = [['IB Language A: Language and Literature HL','IB History of the Americas HL'],['(H) CHEMISTRY', 'IB Language A: Language and Literature HL']]
-# WIP: make function replace parentheses and others 
+
+# WIP: make function replace parentheses and others
+test = [[x.strip() for x in l] for l in course_seq_ls] 
+test = [[x.replace('(', '') for x in l] for l in test]
+test = [[x.replace(')', '') for x in l] for l in test]
+test = [[x.replace(':', '') for x in l] for l in test]
 test = [[x.lower() for x in l] for l in test]
-test = [[x.replace(' ', '_').lower() for x in l] for l in test]
-test = [[x.strip() for x in l] for l in test]
 test = [[x.replace('/', '_') for x in l] for l in test]
+test = [[x.replace(' ', '_') for x in l] for l in test]
 
 test = [[" ".join(w for w in l)] for l in test]
 test = [x for sublist in test for x in sublist] # courses as sequences flattened lists
@@ -85,6 +89,3 @@ plt.xticks(x_pos, course_name)
 plt.ylabel('Course Counts')
 plt.xticks(rotation=90, size=3)
 plt.show()
-
-
-sentence.strip()
