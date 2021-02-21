@@ -89,3 +89,17 @@ plt.xticks(x_pos, course_name)
 plt.ylabel('Course Counts')
 plt.xticks(rotation=90, size=3)
 plt.show()
+
+# Course counts
+n_courses = [len(element) for element in course_seq_ls]
+len(course_seq_ls[24])
+n_courses.sort(reverse=True)
+
+x_pos = np.arange(len(n_courses)) 
+
+plt.bar(x_pos, n_courses, align='center')
+plt.xticks(x_pos) 
+plt.ylabel('Course Counts')
+plt.show()
+
+
