@@ -8,6 +8,8 @@ from pathlib import Path
 import sqlite3
 from sklearn.feature_extraction.text import CountVectorizer
 
+import matplotlib.pyplot as plt
+
 this_file_path = os.path.abspath(__file__)
 project_root = os.path.split(os.path.split(os.path.split(this_file_path)[0])[0])[0]
  
@@ -49,10 +51,11 @@ course_lists = pivot_df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(
 # 1. Replace spaces + / with underscores
 # 2. Lower Case
 course_seq_ls = course_lists['CourseTitle'].to_list() 
-
+test = [['IB Language A: Language and Literature HL','IB History of the Americas HL'],['(H) CHEMISTRY', 'IB Language A: Language and Literature HL']]
 # WIP: make function replace parentheses and others 
-test = [[x.lower() for x in l] for l in course_seq_ls]
-test = [[x.replace(' ', '_').lower() for x in l] for l in course_seq_ls]
+test = [[x.lower() for x in l] for l in test]
+test = [[x.replace(' ', '_').lower() for x in l] for l in test]
+test = [[x.strip() for x in l] for l in test]
 test = [[x.replace('/', '_') for x in l] for l in test]
 
 test = [[" ".join(w for w in l)] for l in test]
@@ -70,4 +73,18 @@ def get_top_n_courses(corpus, n=None):
     words_freq = sorted(words_freq, key = lambda x: x[1], reverse=True)
     return words_freq[:n]
 
-get_top_n_courses(test)
+course_cnt = get_top_n_courses(test, n=100)
+type(course_cnt)
+
+course_name = list(zip(*course_cnt))[0]
+cnt = list(zip(*course_cnt))[1]
+x_pos = np.arange(len(course_cnt)) 
+
+plt.bar(x_pos, cnt, align='center')
+plt.xticks(x_pos, course_name) 
+plt.ylabel('Course Counts')
+plt.xticks(rotation=90, size=3)
+plt.show()
+
+
+sentence.strip()
