@@ -101,5 +101,3 @@ plt.bar(x_pos, n_courses, align='center')
 plt.xticks(x_pos) 
 plt.ylabel('Course Counts')
 plt.show()
-
-
