@@ -98,16 +98,20 @@ sum(results_df['cadr_sum'])
 course_seq_ls = course_list['CourseTitle'].to_list() 
 
 # WIP: make function replace parentheses and others
-test = [[x.strip() for x in l] for l in course_seq_ls] 
-test = [[x.replace('(', '') for x in l] for l in test]
-test = [[x.replace(')', '') for x in l] for l in test]
-test = [[x.replace(':', '') for x in l] for l in test]
-test = [[x.lower() for x in l] for l in test]
-test = [[x.replace('/', '_') for x in l] for l in test]
-test = [[x.replace('-', '') for x in l] for l in test]
-test = [[x.replace(' ', '_') for x in l] for l in test]
-test = [[" ".join(w for w in l)] for l in test]
-test = [x for sublist in test for x in sublist] # courses as sequences flattened lists
+def clean_courses(text=list):
+    crs_ls = [[x.strip() for x in l] for l in course_seq_ls] 
+    crs_ls = [[x.replace('(', '') for x in l] for l in crs_ls]
+    crs_ls = [[x.replace(')', '') for x in l] for l in crs_ls]
+    crs_ls = [[x.replace(':', '') for x in l] for l in crs_ls]
+    crs_ls = [[x.lower() for x in l] for l in crs_ls]
+    crs_ls = [[x.replace('/', '_') for x in l] for l in crs_ls]
+    crs_ls = [[x.replace('-', '') for x in l] for l in crs_ls]
+    crs_ls = [[x.replace(' ', '_') for x in l] for l in crs_ls]
+    crs_ls = [[" ".join(w for w in l)] for l in crs_ls]
+    crs_ls = [x for sublist in crs_ls for x in sublist] 
+    return crs_ls
+
+course_seq = clean_courses(course_seq_ls)
 
 # Check sequence distribution for Renton  
 def get_top_n_courses(corpus, n=None):
