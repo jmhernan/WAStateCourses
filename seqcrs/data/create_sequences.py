@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
 import pandas as pd
+import json
 import os
 import re
 import sys
@@ -20,7 +21,12 @@ db = data_path + 'ccer_data.db'
 con = sqlite3.connect(db)
 
 # Get columns of interests
-query_txt = "SELECT * FROM ghf_renton;"
+query_txt = '''
+SELECT * 
+FROM ghf_tukwila
+WHERE ResearchID IN (SELECT ResearchID 
+    FROM complete_hs_records WHERE DistinctGradeLevelCount = 4);
+'''
 print(query_txt)
 
 df_courses = pd.read_sql_query(query_txt, con)
@@ -45,13 +51,51 @@ columns = ['ResearchID', 'CourseTitle']
 pivot_df = df_passed_crs[columns]
 
 # Most promising method so far!
-course_lists = pivot_df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(x)})
+course_list = pivot_df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(x)}).reset_index()
+
+# ADD codes for known CADRS 
+cadrs_tukwila =  pd.read_csv(os.path.join(data_path,'tukwila_aggregated_results.csv'), delimiter = ',')
+cadrs_tukwila['cadr_sum'] = cadrs_tukwila['art_cadr_v'] + cadrs_tukwila['math_cadr_v'] + cadrs_tukwila['eng_cadr_v'] + cadrs_tukwila['sci_cadr_v'] +\
+    cadrs_tukwila['soc_cadr_v'] + cadrs_tukwila['flang_cadr_v'] - 5
+
+cadrs_tukwila_sub = cadrs_tukwila[['ResearchID','cadr_sum']].dropna()
+cadrs_tukwila_sub.shape
+
+def get_metadata_dict(metadata_file):
+    metadata_handle = open(metadata_file)
+    metadata = json.loads(metadata_handle.read())
+    return metadata
+
+additional_ids = get_metadata_dict(os.path.join(data_path, "tukwila_handcoded.json"))
+
+additional_cadrs = pd.DataFrame(additional_ids)
+
+# Union of cadr eligle students 
+outcomes_y1 = pd.concat([cadrs_tukwila_sub, additional_cadrs], ignore_index=True).drop_duplicates().reset_index(drop=True)
+outcomes_y1.dtypes
+
+# Check coverage
+sum(cadrs_tukwila_sub['ResearchID'].isin(course_list['ResearchID']))
+sum(additional_cadrs['ResearchID'].isin(course_list['ResearchID']))
+
+sum(outcomes_y1['ResearchID'].isin(course_list['ResearchID'])) # issue here prob diff data types force to str
+
+sum(additional_cadrs['ResearchID'].isin(cadrs_tukwila_sub['ResearchID']))
+
+# Join the course student table
+course_list['ResearchID'] = course_list['ResearchID'].astype(str) 
+outcomes_y1['ResearchID'] = outcomes_y1['ResearchID'].astype(str)
+
+results_df = pd.merge(course_list, outcomes_y1, on = 'ResearchID', how = 'left')
+
+results_df['cadr_sum'] = results_df['cadr_sum'].fillna(0)
+
+sum(results_df['cadr_sum'])
 
 # Clean up list of sequences
 # 1. Replace spaces + / with underscores
 # 2. Lower Case
-course_seq_ls = course_lists['CourseTitle'].to_list() 
-test = [['IB Language A: Language and Literature HL','IB History of the Americas HL'],['(H) CHEMISTRY', 'IB Language A: Language and Literature HL']]
+course_seq_ls = course_list['CourseTitle'].to_list() 
 
 # WIP: make function replace parentheses and others
 test = [[x.strip() for x in l] for l in course_seq_ls] 
@@ -60,8 +104,8 @@ test = [[x.replace(')', '') for x in l] for l in test]
 test = [[x.replace(':', '') for x in l] for l in test]
 test = [[x.lower() for x in l] for l in test]
 test = [[x.replace('/', '_') for x in l] for l in test]
+test = [[x.replace('-', '') for x in l] for l in test]
 test = [[x.replace(' ', '_') for x in l] for l in test]
-
 test = [[" ".join(w for w in l)] for l in test]
 test = [x for sublist in test for x in sublist] # courses as sequences flattened lists
 
@@ -90,7 +134,7 @@ plt.ylabel('Course Counts')
 plt.xticks(rotation=90, size=3)
 plt.show()
 
-# Course counts
+# Course counts per Student
 n_courses = [len(element) for element in course_seq_ls]
 len(course_seq_ls[24])
 n_courses.sort(reverse=True)
@@ -101,3 +145,7 @@ plt.bar(x_pos, n_courses, align='center')
 plt.xticks(x_pos) 
 plt.ylabel('Course Counts')
 plt.show()
+# WE CAN SEE THAT NOT EVERYONE HAS COMPLETE RECORDS SOME STUDENTS HAVE A 
+# TOTAL OF 10 COURSES OVERALL
+# NEED TO DO A SUBSET...A COURSE IN ALL 4 YEARS OR SIMILAR
+
