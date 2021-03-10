@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 this_file_path = os.path.abspath(__file__)
 project_root = os.path.split(os.path.split(os.path.split(this_file_path)[0])[0])[0]
- 
+
 data_path = os.path.join(project_root, "data") + '/'
 
 db = data_path + 'ccer_data.db'
