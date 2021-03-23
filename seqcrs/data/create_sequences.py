@@ -156,7 +156,7 @@ results_df['course_seq'] = course_seq
 df_sql = results_df.drop(['CourseTitle'], axis=1)
 # save 
 from sqlalchemy import create_engine
-from sqlalchemy.types import NVARCHAR, Integer
+from sqlalchemy.types import NVARCHAR, Integer, Text
 
 
 engine = create_engine(f"sqlite:///{db}", echo=True)
@@ -164,7 +164,7 @@ sqlite_connection = engine.connect()
 
 sql_table = "sequence_processed"
 df_sql.to_sql(sql_table, sqlite_connection, if_exists='replace',
-    dtype = {'ResearchID':NVARCHAR(), 'CourseTitle': NVARCHAR(), 'cadr_sum':Integer(), 'course_seq':NVARCHAR()})
+    dtype = {'ResearchID':NVARCHAR(), 'cadr_sum':Integer(), 'course_seq':NVARCHAR()})
 
 engine.execute("SELECT * FROM sequence_processed limit 10").fetchall()
 
