@@ -20,7 +20,7 @@ db = data_path + 'ccer_data.db'
 
 con = sqlite3.connect(db)
 
-# Get columns of interests
+# Get columns of interests WIP: Check query!!
 query_txt = '''
 SELECT * 
 FROM ghf_tukwila
@@ -56,7 +56,7 @@ course_list = pivot_df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(x
 # ADD codes for known CADRS 
 cadrs_tukwila =  pd.read_csv(os.path.join(data_path,'tukwila_aggregated_results.csv'), delimiter = ',')
 cadrs_tukwila['cadr_sum'] = cadrs_tukwila['art_cadr_v'] + cadrs_tukwila['math_cadr_v'] + cadrs_tukwila['eng_cadr_v'] + cadrs_tukwila['sci_cadr_v'] +\
-    cadrs_tukwila['soc_cadr_v'] + cadrs_tukwila['flang_cadr_v'] - 5
+    cadrs_tukwila['soc_cadr_v'] + cadrs_tukwila['flang_cadr_v']-5
 
 cadrs_tukwila_sub = cadrs_tukwila[['ResearchID','cadr_sum']].dropna()
 cadrs_tukwila_sub.shape
@@ -125,7 +125,7 @@ def get_top_n_courses(corpus, n=None):
     words_freq = sorted(words_freq, key = lambda x: x[1], reverse=True)
     return words_freq[:n]
 
-course_cnt = get_top_n_courses(test, n=100)
+course_cnt = get_top_n_courses(course_seq, n=100)
 type(course_cnt)
 
 course_name = list(zip(*course_cnt))[0]
@@ -152,4 +152,10 @@ plt.show()
 # WE CAN SEE THAT NOT EVERYONE HAS COMPLETE RECORDS SOME STUDENTS HAVE A 
 # TOTAL OF 10 COURSES OVERALL
 # NEED TO DO A SUBSET...A COURSE IN ALL 4 YEARS OR SIMILAR
+results_df['course_seq'] = course_seq
 
+# save 
+from sqlalchemy import create_engine
+
+engine = create_engine('../data/ccer_data.db', echo=True)
+sqlite_connection = engine.connect()
