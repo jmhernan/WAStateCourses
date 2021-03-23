@@ -153,9 +153,19 @@ plt.show()
 # TOTAL OF 10 COURSES OVERALL
 # NEED TO DO A SUBSET...A COURSE IN ALL 4 YEARS OR SIMILAR
 results_df['course_seq'] = course_seq
-
+df_sql = results_df.drop(['CourseTitle'], axis=1)
 # save 
 from sqlalchemy import create_engine
+from sqlalchemy.types import NVARCHAR, Integer
 
-engine = create_engine('../data/ccer_data.db', echo=True)
+
+engine = create_engine(f"sqlite:///{db}", echo=True)
 sqlite_connection = engine.connect()
+
+sql_table = "sequence_processed"
+df_sql.to_sql(sql_table, sqlite_connection, if_exists='replace',
+    dtype = {'ResearchID':NVARCHAR(), 'CourseTitle': NVARCHAR(), 'cadr_sum':Integer(), 'course_seq':NVARCHAR()})
+
+engine.execute("SELECT * FROM sequence_processed limit 10").fetchall()
+
+sqlite_connection.close()
