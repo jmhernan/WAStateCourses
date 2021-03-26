@@ -69,17 +69,11 @@ sequences = tokenizer.texts_to_sequences(crs_seq)
 seq_pad = pad_sequences(sequences, maxlen=max_seq_len+1)
 seq_pad.shape
 
-# test tf encoder layer 
-encoder = tf.keras.layers.experimental.preprocessing.TextVectorization(
-    max_tokens=VOCAB_SIZE)
-
-encoder.adapt(train_dataset.map(lambda text, label: text))
-
 # Outcome 
 y_label = to_categorical(np.asarray(label))
 
 # Prep test and training 
-x_train, x_val, y_train, y_val = train_test_split(text_pad, label,
+x_train, x_val, y_train, y_val = train_test_split(seq_pad, label,
     test_size=0.2, random_state = 42)
 
 # Build a model
@@ -88,7 +82,7 @@ dropout = .25
 
 
 model = tf.keras.Sequential([
-    tf.keras.layers.Embedding(vocab_size, embedding_dim, mask_zero=True),
+    tf.keras.layers.Embedding(VOCAB_SIZE, embedding_dim, mask_zero=True),
     tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64)),
     tf.keras.layers.Dense(embedding_dim, activation='relu'),
     tf.keras.layers.Dropout(dropout),
@@ -117,7 +111,7 @@ def plot_graphs(history, metric):
 
 plt.figure(figsize=(16,8))
 plt.subplot(1,2,1)
-plot_graphs(history, 'acc')
+plot_graphs(history, 'accuracy')
 plt.ylim(None,1)
 plt.subplot(1,2,2)
 plot_graphs(history, 'loss')
@@ -128,7 +122,7 @@ predictions = model.predict(np.array([sample_courses]))
 
 # Another layer
 model = tf.keras.Sequential([
-    tf.keras.layers.Embedding(vocab_size, embedding_dim, mask_zero=True),
+    tf.keras.layers.Embedding(VOCAB_SIZE, embedding_dim, mask_zero=True),
     tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64,  return_sequences=True)),
     tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(32)),
     tf.keras.layers.Dense(64, activation='relu'),
