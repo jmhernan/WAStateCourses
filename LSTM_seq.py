@@ -110,3 +110,37 @@ plt.subplot(1,2,2)
 plot_graphs(history, 'loss')
 plt.ylim(0,None)
 
+# WIP PREDICTIONS
+predictions = model.predict(np.array([sample_courses]))
+
+# Another layer
+model = tf.keras.Sequential([
+    tf.keras.layers.Embedding(vocab_size, embedding_dim, mask_zero=True),
+    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64,  return_sequences=True)),
+    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(32)),
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dropout(dropout),
+    tf.keras.layers.Dense(1)
+])
+
+model.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+              optimizer=tf.keras.optimizers.Adam(1e-4),
+              metrics=['accuracy'])
+
+history = model.fit(x_train, y_train, epochs=20,
+                    validation_data=(x_val, y_val), 
+                    validation_steps=30)
+
+test_loss, test_acc = model.evaluate(x_val, y_val)
+
+print('Test Loss: {}'.format(test_loss))
+print('Test Accuracy: {}'.format(test_acc))
+
+plt.figure(figsize=(16,8))
+plt.subplot(1,2,1)
+plot_graphs(history, 'acc')
+plt.ylim(None,1)
+plt.subplot(1,2,2)
+plot_graphs(history, 'loss')
+plt.ylim(0,None)
+
