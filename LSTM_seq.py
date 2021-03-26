@@ -4,6 +4,7 @@ import re
 import random
 import sys
 from pathlib import Path
+import matplotlib.pyplot as plt
 
 import csv
 import json
@@ -85,6 +86,27 @@ model.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
               optimizer=tf.keras.optimizers.Adam(1e-4),
               metrics=['accuracy'])
 
-history = model.fit(x_train, y_train, epochs=10,
+history = model.fit(x_train, y_train, epochs=20,
                     validation_data=(x_val, y_val), 
                     validation_steps=30)
+
+test_loss, test_acc = model.evaluate(x_val, y_val)
+
+print('Test Loss: {}'.format(test_loss))
+print('Test Accuracy: {}'.format(test_acc))
+
+def plot_graphs(history, metric):
+  plt.plot(history.history[metric])
+  plt.plot(history.history['val_'+metric], '')
+  plt.xlabel("Epochs")
+  plt.ylabel(metric)
+  plt.legend([metric, 'val_'+metric])
+
+plt.figure(figsize=(16,8))
+plt.subplot(1,2,1)
+plot_graphs(history, 'acc')
+plt.ylim(None,1)
+plt.subplot(1,2,2)
+plot_graphs(history, 'loss')
+plt.ylim(0,None)
+
