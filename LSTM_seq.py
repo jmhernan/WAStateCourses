@@ -65,23 +65,26 @@ seq_pad.shape
 y_label = to_categorical(np.asarray(label))
 
 # Prep test and training 
-x_train, x_val, y_train, y_val = train_test_split(text_pad, y_label,
+x_train, x_val, y_train, y_val = train_test_split(text_pad, label,
     test_size=0.2, random_state = 42)
 
 # Build a model
-embedding_dim = 100
+embedding_dim = 64
 dropout = .25
 
 
 model = tf.keras.Sequential([
-    # Embedding layer
-    tf.keras.layers.Embedding(vocab_size, embedding_dim),
-    # LSTM layer
-    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(embedding_dim, return_sequences=True)),
+    tf.keras.layers.Embedding(vocab_size, embedding_dim, mask_zero=True),
     tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64)),
-    # Dense layer
     tf.keras.layers.Dense(embedding_dim, activation='relu'),
-    # output layer
     tf.keras.layers.Dropout(dropout),
-    tf.keras.layers.Dense(num_classes, activation='softmax')
+    tf.keras.layers.Dense(1, activation='sigmoid')
 ])
+
+model.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+              optimizer=tf.keras.optimizers.Adam(1e-4),
+              metrics=['accuracy'])
+
+history = model.fit(x_train, y_train, epochs=10,
+                    validation_data=(x_val, y_val), 
+                    validation_steps=30)
