@@ -41,10 +41,16 @@ model_df = pd.read_sql_table(
 sqlite_conn.close()
 
 # use the subject class as the label
+# For encoder layer
+# 1. Split the data into Test, Train
+# 2. Run encoder on label and text pairs 
+
 crs_seq = model_df['course_seq']
 
 
-label = model_df['cadr_sum'].tolist()
+label = model_df['cadr_sum']
+
+# Testing for encoder 
 
 # max sequence of course title
 num_words_row = [len(words.split()) for words in crs_seq]
@@ -55,7 +61,7 @@ tokenizer = Tokenizer()
 tokenizer.fit_on_texts(crs_seq)
 word_index = tokenizer.word_index # word and their token # ordered by most frequent
 print('Found %s unique tokens.' % len(word_index))
-vocab_size = 350
+VOCAB_SIZE = 350
 
 sequences = tokenizer.texts_to_sequences(crs_seq)
 
@@ -63,6 +69,13 @@ sequences = tokenizer.texts_to_sequences(crs_seq)
 seq_pad = pad_sequences(sequences, maxlen=max_seq_len+1)
 seq_pad.shape
 
+# test tf encoder layer 
+encoder = tf.keras.layers.experimental.preprocessing.TextVectorization(
+    max_tokens=VOCAB_SIZE)
+
+encoder.adapt(train_dataset.map(lambda text, label: text))
+
+# Outcome 
 y_label = to_categorical(np.asarray(label))
 
 # Prep test and training 
@@ -127,7 +140,7 @@ model.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
               optimizer=tf.keras.optimizers.Adam(1e-4),
               metrics=['accuracy'])
 
-history = model.fit(x_train, y_train, epochs=20,
+history = model.fit(x_train, y_train, epochs=16,
                     validation_data=(x_val, y_val), 
                     validation_steps=30)
 
