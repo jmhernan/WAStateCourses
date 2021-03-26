@@ -1,5 +1,4 @@
 # MODEL CODE FOR CADRS MODEL ADAPT TO SEQUENCE OUTPUT
-
 import os
 import re
 import random
@@ -47,37 +46,29 @@ crs_seq = model_df['course_seq']
 label = model_df['cadr_sum'].tolist()
 
 # max sequence of course title
-num_words_row = [len(words.split()) for words in text]
+num_words_row = [len(words.split()) for words in crs_seq]
 max_seq_len = max(num_words_row)
 
 # Tokenize
 tokenizer = Tokenizer()
-tokenizer.fit_on_texts(text)
+tokenizer.fit_on_texts(crs_seq)
 word_index = tokenizer.word_index # word and their token # ordered by most frequent
 print('Found %s unique tokens.' % len(word_index))
-vocab_size = 589
+vocab_size = 350
 
-sequences = tokenizer.texts_to_sequences(text)
+sequences = tokenizer.texts_to_sequences(crs_seq)
 
 # Padding
-text_pad = pad_sequences(sequences, maxlen=max_seq_len+1)
-text_pad.shape
+seq_pad = pad_sequences(sequences, maxlen=max_seq_len+1)
+seq_pad.shape
 
-# Handling the label
-encoder = LabelEncoder()
-label_arr = encoder.fit_transform(label)
-
-num_classes = np.max(label_arr) + 1 #index at 0
-label_pad = utils.to_categorical(label_arr, num_classes)
-
-print('Shape of data tensor:', text_pad.shape)
-print('Shape of label tensor:', label_pad.shape)
+y_label = to_categorical(np.asarray(label))
 
 # Prep test and training 
-x_train, x_val, y_train, y_val = train_test_split(text_pad, label_pad,
+x_train, x_val, y_train, y_val = train_test_split(text_pad, y_label,
     test_size=0.2, random_state = 42)
 
-# Build a model fun
+# Build a model
 embedding_dim = 100
 dropout = .25
 
