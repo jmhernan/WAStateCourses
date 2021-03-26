@@ -134,7 +134,7 @@ model.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
               optimizer=tf.keras.optimizers.Adam(1e-4),
               metrics=['accuracy'])
 
-history = model.fit(x_train, y_train, epochs=16,
+history = model.fit(x_train, y_train, epochs=20,
                     validation_data=(x_val, y_val), 
                     validation_steps=30)
 
