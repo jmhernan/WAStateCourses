@@ -101,13 +101,6 @@ test_loss, test_acc = model.evaluate(x_val, y_val)
 print('Test Loss: {}'.format(test_loss))
 print('Test Accuracy: {}'.format(test_acc))
 
-def plot_graphs(history, metric):
-  plt.plot(history.history[metric])
-  plt.plot(history.history['val_'+metric], '')
-  plt.xlabel("Epochs")
-  plt.ylabel(metric)
-  plt.legend([metric, 'val_'+metric])
-
 plt.figure(figsize=(16,8))
 plt.subplot(1,2,1)
 plot_graphs(history, 'accuracy')
@@ -123,7 +116,7 @@ plt.ylim(0,None)
 model_multi = tf.keras.Sequential([
     tf.keras.layers.Embedding(VOCAB_SIZE, embedding_dim, mask_zero=True),
     tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64,  return_sequences=True)),
-    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(100)),
+    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64)),
     tf.keras.layers.Dense(64, activation='relu'),
     tf.keras.layers.Dropout(dropout),
     tf.keras.layers.Dense(1)
