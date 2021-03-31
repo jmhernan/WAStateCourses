@@ -2,13 +2,6 @@ import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import CountVectorizer
 import json
 
-def plot_graphs(history, metric):
-  plt.plot(history.history[metric])
-  plt.plot(history.history['val_'+metric], '')
-  plt.xlabel("Epochs")
-  plt.ylabel(metric)
-  plt.legend([metric, 'val_'+metric])
-
 def get_top_n_courses(corpus, n=None):
     """
     List the top n words in a vocabulary according to occurrence in a text corpus.
