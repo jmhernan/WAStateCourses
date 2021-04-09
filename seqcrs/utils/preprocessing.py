@@ -13,12 +13,12 @@ def get_top_n_courses(corpus, n=None):
     words_freq = sorted(words_freq, key = lambda x: x[1], reverse=True)
     return words_freq[:n]
 
-    def get_metadata_dict(metadata_file):
+def get_metadata_dict(metadata_file):
     metadata_handle = open(metadata_file)
     metadata = json.loads(metadata_handle.read())
     return metadata
 
-    def clean_courses(text=list):
+def clean_courses(text=list):
     crs_ls = [[x.strip() for x in l] for l in course_seq_ls] 
     crs_ls = [[x.replace('(', '') for x in l] for l in crs_ls]
     crs_ls = [[x.replace(')', '') for x in l] for l in crs_ls]
