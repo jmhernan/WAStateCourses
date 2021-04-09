@@ -10,15 +10,15 @@ import sqlite3
 from sklearn.feature_extraction.text import CountVectorizer#
 
 import matplotlib.pyplot as plt
+from sqlalchemy import create_engine
+
+import time
 
 this_file_path = os.path.abspath(__file__)
-project_root = os.path.split(os.path.split(os.path.split(this_file_path)[0])[0])[0]
+project_root = os.path.split(os.path.split(os.path.split(
+                                           this_file_path)[0])[0])[0]
 
 data_path = os.path.join(project_root, "data") + '/'
-
-db = data_path + 'ccer_data.db'
-
-con = sqlite3.connect(db)
 
 # Get columns of interests WIP: Check query!!
 query_txt = '''
@@ -29,12 +29,15 @@ WHERE ResearchID IN (SELECT ResearchID
 '''
 print(query_txt)
 
-df_courses = pd.read_sql_query(query_txt, con)
-con.close()
+wastate_db = data_path + 'ccer_data.db'
 
-df_courses.shape
-df_courses.columns
+# connect to db and load data
+engine = create_engine(f"sqlite:///{wastate_db}", echo=True)
+sqlite_conn = engine.connect()
 
+df_courses = pd.read_sql(query_txt, con=sqlite_conn)
+
+sqlite_conn.close()
 
 # Create data file of ordered course sequences for cohort 
 # 1. Order by term 
