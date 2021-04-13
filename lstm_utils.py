@@ -1,5 +1,7 @@
 # LSTM UTILS
 import matplotlib.pyplot as plt
+import tensorflow as tf
+from tensorflow.keras.preprocessing.text import Tokenizer
 
 class callbackLimit():
     pass
