@@ -61,7 +61,7 @@ tokenizer = Tokenizer()
 tokenizer.fit_on_texts(crs_seq)
 word_index = tokenizer.word_index # word and their token # ordered by most frequent
 print('Found %s unique tokens.' % len(word_index))
-VOCAB_SIZE = 350
+vocab_size = 350
 
 sequences = tokenizer.texts_to_sequences(crs_seq)
 
@@ -80,6 +80,26 @@ x_train, x_val, y_train, y_val = train_test_split(seq_pad, label,
 embedding_dim = 64
 dropout = .25
 
+# Build model
+def model_build(vocab_size, embedding_dim=64, dropout=.25, hidden_layers=1):
+    if hidden_layers > 1:
+        model = tf.keras.Sequential([
+        tf.keras.layers.Embedding(vocab_size, embedding_dim, mask_zero=True),
+        tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64,  return_sequences=True)),
+        tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64)),
+        tf.keras.layers.Dense(embedding_dim, activation='relu'),
+        tf.keras.layers.Dropout(dropout),
+        tf.keras.layers.Dense(1, activation='sigmoid')])
+    else:
+        model = tf.keras.Sequential([
+        tf.keras.layers.Embedding(vocab_size, embedding_dim, mask_zero=True),
+        tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64)),
+        tf.keras.layers.Dense(embedding_dim, activation='relu'),
+        tf.keras.layers.Dropout(dropout),
+        tf.keras.layers.Dense(1, activation='sigmoid')])
+    return model
+
+model = model_build(vocab_size=vocab_size)
 
 model = tf.keras.Sequential([
     tf.keras.layers.Embedding(VOCAB_SIZE, embedding_dim, mask_zero=True),
@@ -100,6 +120,13 @@ test_loss, test_acc = model.evaluate(x_val, y_val)
 
 print('Test Loss: {}'.format(test_loss))
 print('Test Accuracy: {}'.format(test_acc))
+
+def plot_graphs(history, metric):
+  plt.plot(history.history[metric])
+  plt.plot(history.history['val_'+metric], '')
+  plt.xlabel("Epochs")
+  plt.ylabel(metric)
+  plt.legend([metric, 'val_'+metric])
 
 plt.figure(figsize=(16,8))
 plt.subplot(1,2,1)
@@ -122,14 +149,16 @@ model_multi = tf.keras.Sequential([
     tf.keras.layers.Dense(1)
 ])
 
-model_multi.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+model_2 = model_build(vocab_size=vocab_size, hidden_layers=2)
+
+model_2.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
               optimizer=tf.keras.optimizers.Adam(1e-4),
               metrics=['accuracy'])
 
-history = model_multi.fit(x_train, y_train, epochs=20,
+history = model_2.fit(x_train, y_train, epochs=20,
                     validation_data=(x_val, y_val))
 
-test_loss, test_acc = model_multi.evaluate(x_val, y_val)
+test_loss, test_acc = model_2.evaluate(x_val, y_val)
 
 print('Test Loss: {}'.format(test_loss))
 print('Test Accuracy: {}'.format(test_acc))

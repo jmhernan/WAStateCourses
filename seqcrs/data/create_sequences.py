@@ -39,13 +39,17 @@ df_courses = pd.read_sql(query_txt, con=sqlite_conn)
 
 sqlite_conn.close()
 
+df_courses.shape
+df_courses.columns
+
 # Create data file of ordered course sequences for cohort 
 # 1. Order by term 
 # 2. ommit failed courses 
 # 3. pivot wide for sequence by Research ID 
 # 4. Convert to list
-df_sorted = df_courses.sort_values(['CourseTitle'], ascending=True).groupby(['ResearchID'], sort=False)\
-    .apply(lambda x: x.sort_values(['TermEndDate'], ascending = True)).reset_index(drop=True)
+df_sorted = df_courses.sort_values(['CourseTitle'], ascending=True).groupby(
+        ['ResearchID'], sort=False).apply(lambda x: x.sort_values(
+        ['TermEndDate'], ascending = True)).reset_index(drop=True)
 
 failed_courses = df_sorted['CreditsEarned'].astype(float) > 0 
 df_passed_crs =  df_sorted[failed_courses].reset_index(drop=True)
