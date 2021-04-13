@@ -4,8 +4,24 @@ import matplotlib.pyplot as plt
 class callbackLimit():
     pass
 
-def model_buid():
-    pass
+def model_build(vocab_size, embedding_dim=64, dropout=.25, hidden_layers=1):
+    if hidden_layers > 1:
+        model = tf.keras.Sequential([
+        tf.keras.layers.Embedding(VOCAB_SIZE, embedding_dim, mask_zero=True),
+        tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64,  return_sequences=True)),
+        tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64)),
+        tf.keras.layers.Dense(embedding_dim, activation='relu'),
+        tf.keras.layers.Dropout(dropout),
+        tf.keras.layers.Dense(1)])
+    else:
+        model = tf.keras.Sequential([
+        tf.keras.layers.Embedding(VOCAB_SIZE, embedding_dim, mask_zero=True),
+        tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64)),
+        tf.keras.layers.Dense(embedding_dim, activation='relu'),
+        tf.keras.layers.Dropout(dropout),
+        tf.keras.layers.Dense(1, activation='sigmoid')])
+    return model
+
 
 def train_model():
     pass
