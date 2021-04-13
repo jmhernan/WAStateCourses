@@ -5,7 +5,8 @@ class callbackLimit():
     pass
 
 def model_build(vocab_size, embedding_dim=64, dropout=.25, hidden_layers=1):
-    if hidden_layers > 1:
+    if hidden_layers > 1: # WIP: Need to add different hidden layer conditions
+        # DO CV TO COMPARE AND FINETUNE IN GRID SEARCH METHOD
         model = tf.keras.Sequential([
         tf.keras.layers.Embedding(VOCAB_SIZE, embedding_dim, mask_zero=True),
         tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64,  return_sequences=True)),
