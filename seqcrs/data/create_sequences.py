@@ -165,7 +165,6 @@ df_sql = results_df.drop(['CourseTitle'], axis=1)
 from sqlalchemy import create_engine
 from sqlalchemy.types import NVARCHAR, Integer, Text
 
-
 engine = create_engine(f"sqlite:///{db}", echo=True)
 sqlite_connection = engine.connect()
 
