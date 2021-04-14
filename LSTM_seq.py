@@ -21,6 +21,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 
 from sqlalchemy import create_engine
+import lstm_utils as lu 
 
 this_file_path = os.path.abspath(__file__)
 project_root = os.path.split(this_file_path)[0]
@@ -29,7 +30,7 @@ data_path = os.path.join(project_root, "data") + '/'
 
 wastate_db = data_path + 'ccer_data.db'
 
-# connect to db and load data
+# WIP: Function to connect to db and load data
 engine = create_engine(f"sqlite:///{wastate_db}", echo=True)
 sqlite_conn = engine.connect()
 
@@ -57,13 +58,9 @@ num_words_row = [len(words.split()) for words in crs_seq]
 max_seq_len = max(num_words_row)
 
 # Tokenize
-tokenizer = Tokenizer()
-tokenizer.fit_on_texts(crs_seq)
-word_index = tokenizer.word_index # word and their token # ordered by most frequent
+word_index, sequences = lu.tokenize_seq(crs_seq)
 print('Found %s unique tokens.' % len(word_index))
 vocab_size = 350
-
-sequences = tokenizer.texts_to_sequences(crs_seq)
 
 # Padding
 seq_pad = pad_sequences(sequences, maxlen=max_seq_len+1)
@@ -76,44 +73,15 @@ y_label = to_categorical(np.asarray(label))
 x_train, x_val, y_train, y_val = train_test_split(seq_pad, label,
     test_size=0.2, random_state = 42)
 
-# Build a model
-embedding_dim = 64
-dropout = .25
-
 # Build model
-def model_build(vocab_size, embedding_dim=64, dropout=.50, hidden_layers=1):
-    if hidden_layers > 1:
-        model = tf.keras.Sequential([
-        tf.keras.layers.Embedding(vocab_size, embedding_dim, mask_zero=True),
-        tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64,  return_sequences=True)),
-        tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64)),
-        tf.keras.layers.Dense(embedding_dim, activation='relu'),
-        tf.keras.layers.Dropout(dropout),
-        tf.keras.layers.Dense(1, activation='sigmoid')])
-    else:
-        model = tf.keras.Sequential([
-        tf.keras.layers.Embedding(vocab_size, embedding_dim, mask_zero=True),
-        tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64)),
-        tf.keras.layers.Dense(embedding_dim, activation='relu'),
-        tf.keras.layers.Dropout(dropout),
-        tf.keras.layers.Dense(1, activation='sigmoid')])
-    return model
 
-model = model_build(vocab_size=vocab_size)
-
-model = tf.keras.Sequential([
-    tf.keras.layers.Embedding(VOCAB_SIZE, embedding_dim, mask_zero=True),
-    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64)),
-    tf.keras.layers.Dense(embedding_dim, activation='relu'),
-    tf.keras.layers.Dropout(dropout),
-    tf.keras.layers.Dense(1, activation='sigmoid')
-])
+model = lu.model_build(vocab_size=vocab_size)
 
 model.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
               optimizer=tf.keras.optimizers.Adam(1e-4),
               metrics=['accuracy'])
 
-history = model.fit(x_train, y_train, epochs=100,
+history = model.fit(x_train, y_train, epochs=50,
                     batch_size=32,
                     validation_data=(x_val, y_val))
 
@@ -122,41 +90,25 @@ test_loss, test_acc = model.evaluate(x_val, y_val)
 print('Test Loss: {}'.format(test_loss))
 print('Test Accuracy: {}'.format(test_acc))
 
-def plot_graphs(history, metric):
-  plt.plot(history.history[metric])
-  plt.plot(history.history['val_'+metric], '')
-  plt.xlabel("Epochs")
-  plt.ylabel(metric)
-  plt.legend([metric, 'val_'+metric])
-
 plt.figure(figsize=(16,8))
 plt.subplot(1,2,1)
-plot_graphs(history, 'accuracy')
+lu.plot_graphs(history, 'accuracy')
 plt.ylim(None,1)
 plt.subplot(1,2,2)
-plot_graphs(history, 'loss')
+lu.plot_graphs(history, 'loss')
 plt.ylim(0,None)
 
 # WIP PREDICTIONS
 # predictions = model.predict(np.array([sample_courses])) 
 
 # Another layer
-model_multi = tf.keras.Sequential([
-    tf.keras.layers.Embedding(VOCAB_SIZE, embedding_dim, mask_zero=True),
-    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64,  return_sequences=True)),
-    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64)),
-    tf.keras.layers.Dense(64, activation='relu'),
-    tf.keras.layers.Dropout(dropout),
-    tf.keras.layers.Dense(1)
-])
-
-model_2 = model_build(vocab_size=vocab_size, hidden_layers=2)
+model_2 = lu.model_build(vocab_size=vocab_size, hidden_layers=2)
 
 model_2.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
               optimizer=tf.keras.optimizers.Adam(1e-4),
               metrics=['accuracy'])
 
-history = model_2.fit(x_train, y_train, epochs=100,
+history = model_2.fit(x_train, y_train, epochs=30,
                     batch_size=32,
                     validation_data=(x_val, y_val))
 
@@ -167,9 +119,8 @@ print('Test Accuracy: {}'.format(test_acc))
 
 plt.figure(figsize=(16,8))
 plt.subplot(1,2,1)
-plot_graphs(history, 'accuracy')
+lu.plot_graphs(history, 'accuracy')
 plt.ylim(None,1)
 plt.subplot(1,2,2)
-plot_graphs(history, 'loss')
+lu.plot_graphs(history, 'loss')
 plt.ylim(0,None)
-
