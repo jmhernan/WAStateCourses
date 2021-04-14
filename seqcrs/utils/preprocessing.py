@@ -18,7 +18,7 @@ def get_metadata_dict(metadata_file):
     metadata = json.loads(metadata_handle.read())
     return metadata
 
-def clean_courses(text=list):
+def clean_courses(text=list()):
     crs_ls = [[x.strip() for x in l] for l in course_seq_ls] 
     crs_ls = [[x.replace('(', '') for x in l] for l in crs_ls]
     crs_ls = [[x.replace(')', '') for x in l] for l in crs_ls]
@@ -30,3 +30,17 @@ def clean_courses(text=list):
     crs_ls = [[" ".join(w for w in l)] for l in crs_ls]
     crs_ls = [x for sublist in crs_ls for x in sublist] 
     return crs_ls
+
+# WIP: Load raw data 
+# provide option for summary stats and viz
+def load_sql():
+    pass
+
+# WIP: create sequences
+# provide option for summary stats and viz
+def to_sequence():
+    pass
+
+# WIP: save to sql db
+def save_to_db():
+    pass
