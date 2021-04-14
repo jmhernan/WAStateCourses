@@ -81,7 +81,7 @@ embedding_dim = 64
 dropout = .25
 
 # Build model
-def model_build(vocab_size, embedding_dim=64, dropout=.25, hidden_layers=1):
+def model_build(vocab_size, embedding_dim=64, dropout=.50, hidden_layers=1):
     if hidden_layers > 1:
         model = tf.keras.Sequential([
         tf.keras.layers.Embedding(vocab_size, embedding_dim, mask_zero=True),
@@ -113,7 +113,8 @@ model.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
               optimizer=tf.keras.optimizers.Adam(1e-4),
               metrics=['accuracy'])
 
-history = model.fit(x_train, y_train, epochs=20,
+history = model.fit(x_train, y_train, epochs=100,
+                    batch_size=32,
                     validation_data=(x_val, y_val))
 
 test_loss, test_acc = model.evaluate(x_val, y_val)
@@ -155,7 +156,8 @@ model_2.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
               optimizer=tf.keras.optimizers.Adam(1e-4),
               metrics=['accuracy'])
 
-history = model_2.fit(x_train, y_train, epochs=20,
+history = model_2.fit(x_train, y_train, epochs=100,
+                    batch_size=32,
                     validation_data=(x_val, y_val))
 
 test_loss, test_acc = model_2.evaluate(x_val, y_val)
