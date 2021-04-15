@@ -44,12 +44,19 @@ df_courses.columns
 
 # Create data file of ordered course sequences for cohort 
 # 1. Order by term 
-# 2. ommit failed courses 
+# 2. Omit failed courses 
 # 3. pivot wide for sequence by Research ID 
 # 4. Convert to list
-df_sorted = df_courses.sort_values(['CourseTitle'], ascending=True).groupby(
-        ['ResearchID'], sort=False).apply(lambda x: x.sort_values(
-        ['TermEndDate'], ascending = True)).reset_index(drop=True)
+
+# Sort test 
+# WIP: sorting is still not working, gradelevel all over
+# to do: change grade level to int...
+IDs = ['###', '###']
+sort_test = df_courses[df_courses.ResearchID.isin(IDs)]
+sorted_df = sort_test.groupby(
+        ['ResearchID','GradeLevelWhenCourseTaken'], sort=False).apply(lambda x: x.sort_values(
+        ['GradeLevelWhenCourseTaken','CourseTitle'], ascending = [False,True])).reset_index(drop=True)
+##################
 
 failed_courses = df_sorted['CreditsEarned'].astype(float) > 0 
 df_passed_crs =  df_sorted[failed_courses].reset_index(drop=True)
