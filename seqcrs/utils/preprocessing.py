@@ -18,7 +18,7 @@ def get_metadata_dict(metadata_file):
     metadata = json.loads(metadata_handle.read())
     return metadata
 
-def clean_courses(text=list()):
+def clean_courses(text):
     crs_ls = [[x.strip() for x in l] for l in text] 
     crs_ls = [[x.replace('(', '') for x in l] for l in crs_ls]
     crs_ls = [[x.replace(')', '') for x in l] for l in crs_ls]
