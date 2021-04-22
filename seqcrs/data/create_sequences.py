@@ -42,20 +42,21 @@ sqlite_conn.close()
 df_courses.shape
 df_courses.columns
 
+df_courses['GradeLevelWhenCourseTaken'] = df_courses['GradeLevelWhenCourseTaken'].astype(int)
 # Create data file of ordered course sequences for cohort 
 # 1. Order by term 
 # 2. Omit failed courses 
 # 3. pivot wide for sequence by Research ID 
 # 4. Convert to list
 
-# Sort test 
-# WIP: sorting is still not working, gradelevel all over
-# to do: change grade level to int...
-IDs = ['###', '###']
-sort_test = df_courses[df_courses.ResearchID.isin(IDs)]
-sorted_df = sort_test.groupby(
-        ['ResearchID','GradeLevelWhenCourseTaken'], sort=False).apply(lambda x: x.sort_values(
-        ['GradeLevelWhenCourseTaken','CourseTitle'], ascending = [False,True])).reset_index(drop=True)
+# Sort
+# WIP: Sorts student course history by grade (9,10,11,12) 
+# and course alpha order
+sorted_df = df_courses.groupby(
+        ['ResearchID','GradeLevelWhenCourseTaken'], 
+        sort=True).apply(lambda x: x.sort_values(
+        ['GradeLevelWhenCourseTaken','CourseTitle'], 
+        ascending = [False,True])).reset_index(drop=True)
 ##################
 
 failed_courses = df_sorted['CreditsEarned'].astype(float) > 0 
@@ -68,8 +69,13 @@ pivot_df = df_passed_crs[columns]
 course_list = pivot_df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(x)}).reset_index()
 
 # ADD codes for known CADRS 
-cadrs_tukwila =  pd.read_csv(os.path.join(data_path,'tukwila_aggregated_results.csv'), delimiter = ',')
-cadrs_tukwila['cadr_sum'] = cadrs_tukwila['art_cadr_v'] + cadrs_tukwila['math_cadr_v'] + cadrs_tukwila['eng_cadr_v'] + cadrs_tukwila['sci_cadr_v'] +\
+tukwila_coded_fn = 'tukwila_aggregated_results.csv'
+cadrs_tukwila =  pd.read_csv(os.path.join(data_path,tukwila_coded_fn),
+                             delimiter = ',')
+
+cadrs_tukwila['cadr_sum'] = cadrs_tukwila['art_cadr_v'] +\ 
+    cadrs_tukwila['math_cadr_v'] + cadrs_tukwila['eng_cadr_v'] +\ 
+    cadrs_tukwila['sci_cadr_v'] +\
     cadrs_tukwila['soc_cadr_v'] + cadrs_tukwila['flang_cadr_v']-5
 
 cadrs_tukwila_sub = cadrs_tukwila[['ResearchID','cadr_sum']].dropna()
