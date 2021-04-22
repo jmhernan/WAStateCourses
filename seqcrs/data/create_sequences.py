@@ -11,6 +11,8 @@ from sklearn.feature_extraction.text import CountVectorizer#
 
 import matplotlib.pyplot as plt
 from sqlalchemy import create_engine
+from sqlalchemy.types import NVARCHAR, Integer, Text
+
 
 import time
 
@@ -52,7 +54,7 @@ df_courses['GradeLevelWhenCourseTaken'] = df_courses['GradeLevelWhenCourseTaken'
 # Sort
 # WIP: Sorts student course history by grade (9,10,11,12) 
 # and course alpha order
-sorted_df = df_courses.groupby(
+df_sorted = df_courses.groupby(
         ['ResearchID','GradeLevelWhenCourseTaken'], 
         sort=True).apply(lambda x: x.sort_values(
         ['GradeLevelWhenCourseTaken','CourseTitle'], 
@@ -65,7 +67,7 @@ df_passed_crs =  df_sorted[failed_courses].reset_index(drop=True)
 columns = ['ResearchID', 'CourseTitle']
 pivot_df = df_passed_crs[columns]
 
-# Most promising method so far!
+# WIP: Most promising method so far one row per student and course sequence
 course_list = pivot_df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(x)}).reset_index()
 
 # ADD codes for known CADRS 
@@ -73,10 +75,12 @@ tukwila_coded_fn = 'tukwila_aggregated_results.csv'
 cadrs_tukwila =  pd.read_csv(os.path.join(data_path,tukwila_coded_fn),
                              delimiter = ',')
 
-cadrs_tukwila['cadr_sum'] = cadrs_tukwila['art_cadr_v'] +\ 
-    cadrs_tukwila['math_cadr_v'] + cadrs_tukwila['eng_cadr_v'] +\ 
-    cadrs_tukwila['sci_cadr_v'] +\
-    cadrs_tukwila['soc_cadr_v'] + cadrs_tukwila['flang_cadr_v']-5
+cadrs_tukwila['cadr_sum'] = cadrs_tukwila['art_cadr_v'] + \
+    cadrs_tukwila['math_cadr_v'] + \
+    cadrs_tukwila['eng_cadr_v'] + \
+    cadrs_tukwila['sci_cadr_v'] + \
+    cadrs_tukwila['soc_cadr_v'] + \
+    cadrs_tukwila['flang_cadr_v']-5
 
 cadrs_tukwila_sub = cadrs_tukwila[['ResearchID','cadr_sum']].dropna()
 cadrs_tukwila_sub.shape
@@ -169,16 +173,20 @@ plt.bar(x_pos, n_courses, align='center')
 plt.xticks(x_pos) 
 plt.ylabel('Course Counts')
 plt.show()
-# WE CAN SEE THAT NOT EVERYONE HAS COMPLETE RECORDS SOME STUDENTS HAVE A 
+
+# WIP: WE CAN SEE THAT NOT EVERYONE HAS COMPLETE RECORDS SOME STUDENTS HAVE A 
 # TOTAL OF 10 COURSES OVERALL
 # NEED TO DO A SUBSET...A COURSE IN ALL 4 YEARS OR SIMILAR
+
+# 
+# Save to SQL DB
 results_df['course_seq'] = course_seq
 df_sql = results_df.drop(['CourseTitle'], axis=1)
 # save 
 from sqlalchemy import create_engine
 from sqlalchemy.types import NVARCHAR, Integer, Text
 
-engine = create_engine(f"sqlite:///{db}", echo=True)
+engine = create_engine(f"sqlite:///{wastate_db}", echo=True)
 sqlite_connection = engine.connect()
 
 sql_table = "sequence_processed"
