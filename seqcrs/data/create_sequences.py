@@ -18,13 +18,14 @@ import time
 
 
 this_file_path = os.path.abspath(__file__)
-utils_path = os.path.split(os.path.split(this_file_path)[0])[0] + '/utils'
-sys.path.insert(1, utils_path)
 
-import preprocessing as pp
+preprocess_path = os.path.split(os.path.split(this_file_path)[0])[0]
+sys.path.insert(1, preprocess_path)
 
 project_root = os.path.split(os.path.split(os.path.split(
                                            this_file_path)[0])[0])[0]
+
+import preprocessing as pp
 
 data_path = os.path.join(project_root, "data") + '/'
 
