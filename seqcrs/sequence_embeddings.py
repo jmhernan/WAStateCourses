@@ -20,10 +20,47 @@ wastate_db = data_path + 'ccer_data.db'
 
 sql_script = project_root + '/seqcrs/data/course_history_load.sql'
 
-course_df = pp.exec_sql_from_file(filename=sql_script, db_path=wastate_db)
+course_df = pp.execute_sql(sql_filename=sql_script, db_path=wastate_db)
 
 course_df.columns
-len(course_df['ResearchID'].unique().tolist())
-# ~125,000 course sequences
+len(course_df['ResearchID'].unique().tolist()) # ~125,000 course sequences
 
 # Prep sequences for Word2Vec 
+# WIP: pandas is not the way to do this on ~1 million records of course histories
+# Try using sql and loading the table after executing ...
+df_sorted = course_df.groupby(
+        ['ResearchID','GradeLevelWhenCourseTaken'], 
+        sort=True).apply(lambda x: x.sort_values(
+        ['GradeLevelWhenCourseTaken','CourseTitle'], 
+        ascending = [False,True])).reset_index(drop=True)
+
+# Test SQL 
+
+columns = ['ResearchID', 'CourseTitle']
+pivot_df = df_sorted[columns]
+
+# WIP: Most promising method so far one row per student and course sequence
+course_list = pivot_df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(x)}).reset_index()
+
+course_seq_ls = course_list['CourseTitle'].to_list() 
+
+course_seq = pp.clean_courses(course_seq_ls)
+# Word2Vec
+tokenized_text = [word_tokenize(i) for i in corpus]
+
+# word embedding model
+model_baseline = Word2Vec(tokenized_text, min_count=1) 
+
+len(list(model_baseline.wv.vocab))
+
+# 100 most occuring 
+model_baseline.wv.index2entity[:100] # same as top_n words
+
+# Build a function
+keywords = [
+    'algebra',
+    'calculus'
+]
+
+# gets combination 
+tp.get_similar_words(keywords, 10, model_baseline)
