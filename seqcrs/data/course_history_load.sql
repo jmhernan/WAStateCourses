@@ -13,5 +13,6 @@
 
 SELECT ResearchID, CourseTitle, GradeLevelWhenCourseTaken
 FROM hsCourses
-ORDER BY GradeLevelWhenCourseTaken
-LIMIT 10;
+GROUP BY ResearchID, GradeLevelWhenCourseTaken
+ORDER BY GradeLevelWhenCourseTaken DESC
+LIMIT 100;
