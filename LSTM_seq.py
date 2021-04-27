@@ -41,6 +41,17 @@ model_df = pd.read_sql_table(
 
 sqlite_conn.close()
 
+def load_sql_table(table_name, db_name):
+    engine = create_engine(f"sqlite:///{db_name}", echo=False) # Find a way to use this in messages
+    sqlite_conn = engine.connect()
+    df = pd.read_sql_table(
+        table_name,
+        con=sqlite_conn
+    )
+    sqlite_conn.close()
+    return df
+
+model_df = load_sql_table(table_name='sequence_processed', db_name=wastate_db)
 # use the subject class as the label
 # For encoder layer
 # 1. Split the data into Test, Train
