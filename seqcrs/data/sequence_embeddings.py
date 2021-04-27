@@ -14,6 +14,28 @@ data_path = os.path.join(project_root, "data") + '/'
 wastate_db = data_path + 'ccer_data.db'
 
 # WIP: Function to connect to db and load data
+fd = open(project_root + '/seqcrs/data/course_history_load.sql', 'r')
+sqlFile = fd.read()
+fd.close()
+
+def exec_sql_from_file(filename, db_path):
+    # Open and read the file as a single buffer
+    fd = open(filename, 'r')
+    query_txt = fd.read()
+    fd.close()
+    # Connect to DB
+    engine = create_engine(f"sqlite:///{db_path}", echo=False)
+    sqlite_conn = engine.connect()
+    # Execute and load table as pandas df
+    df = pd.read_sql(query_txt, con=sqlite_conn)
+    # Close the connection
+    sqlite_conn.close()
+    return df
+
+sql_script = project_root + '/seqcrs/data/course_history_load.sql'
+
+test = exec_sql_from_file(filename=sql_script, db_path=wastate_db)
+
 engine = create_engine(f"sqlite:///{wastate_db}", echo=True)
 sqlite_conn = engine.connect()
 
