@@ -13,17 +13,14 @@ import matplotlib.pyplot as plt
 from sqlalchemy import create_engine
 from sqlalchemy.types import NVARCHAR, Integer, Text
 
-
 import time
-
 
 this_file_path = os.path.abspath(__file__)
 
 preprocess_path = os.path.split(os.path.split(this_file_path)[0])[0]
 sys.path.insert(1, preprocess_path)
 
-project_root = os.path.split(os.path.split(os.path.split(
-                                           this_file_path)[0])[0])[0]
+project_root = os.path.split(os.path.split(this_file_path)[0])[0]
 
 import preprocessing as pp
 
@@ -154,8 +151,7 @@ plt.show()
 # WIP: WE CAN SEE THAT NOT EVERYONE HAS COMPLETE RECORDS SOME STUDENTS HAVE A 
 # TOTAL OF 10 COURSES OVERALL
 # NEED TO DO A SUBSET...A COURSE IN ALL 4 YEARS OR SIMILAR
-
-# 
+ 
 # Save to SQL DB
 results_df['course_seq'] = course_seq
 df_sql = results_df.drop(['CourseTitle'], axis=1)
