@@ -151,7 +151,7 @@ plt.show()
 # WIP: WE CAN SEE THAT NOT EVERYONE HAS COMPLETE RECORDS SOME STUDENTS HAVE A 
 # TOTAL OF 10 COURSES OVERALL
 # NEED TO DO A SUBSET...A COURSE IN ALL 4 YEARS OR SIMILAR
- 
+
 # Save to SQL DB
 results_df['course_seq'] = course_seq
 df_sql = results_df.drop(['CourseTitle'], axis=1)
