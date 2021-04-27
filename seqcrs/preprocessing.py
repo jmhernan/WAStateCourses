@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import CountVectorizer
 import json
+import pandas as pd
+from sqlalchemy import create_engine
 
 def get_top_n_courses(corpus, n=None):
     """
