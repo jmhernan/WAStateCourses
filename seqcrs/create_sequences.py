@@ -38,12 +38,7 @@ print(query_txt)
 wastate_db = data_path + 'ccer_data.db'
 
 # connect to db and load data
-engine = create_engine(f"sqlite:///{wastate_db}", echo=True)
-sqlite_conn = engine.connect()
-
-df_courses = pd.read_sql(query_txt, con=sqlite_conn)
-
-sqlite_conn.close()
+df_courses = pp.execute_sql(db_path=wastate_db, sql_txt=query_txt)
 
 df_courses.shape
 df_courses.columns
