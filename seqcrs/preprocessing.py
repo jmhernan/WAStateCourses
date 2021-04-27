@@ -48,7 +48,7 @@ def load_sql_table(table_name, db_name):
     sqlite_conn.close()
     return df
 
-def execute_sql(sql_filename=None, db_path, sql_txt=None):
+def execute_sql(db_path,sql_filename=None,sql_txt=None):
     # Connect to DB
     engine = create_engine(f"sqlite:///{db_path}", echo=False)
     sqlite_conn = engine.connect()
