@@ -1,6 +1,7 @@
 # Sequence summary functions and tools
 # leverage Sequence Graph Transform embeddings 
 # Compare to word2vec
+# Train on sequences of all courses taken in RMP Region
 
 import pandas as pd
 from sqlalchemy import create_engine
@@ -16,9 +17,16 @@ wastate_db = data_path + 'ccer_data.db'
 engine = create_engine(f"sqlite:///{wastate_db}", echo=True)
 sqlite_conn = engine.connect()
 
-model_df = pd.read_sql_table(
-    'sequence_processed',
+course_df = pd.read_sql_table(
+    'hsCourses',
     con=sqlite_conn
 )
 
 sqlite_conn.close()
+
+course_df.columns
+course_df['ReportSchoolYear'].value_counts()
+len(course_df['ResearchID'].unique().tolist())
+# 125,000 course sequences
+
+# Prep sequences for Word2Vec 
