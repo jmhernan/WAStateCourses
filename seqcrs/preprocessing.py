@@ -31,10 +31,34 @@ def clean_courses(text_ls):
     crs_ls = [x for sublist in crs_ls for x in sublist] 
     return crs_ls
 
-# WIP: Load raw data 
-# provide option for summary stats and viz
-def load_sql():
-    pass
+# WIP: 
+# 1. Load raw data tables ✅
+# 2. Load using SQL script ✅
+# 3. Load overriding with your own script
+# 4. Provide option for summary stats and viz.
+def load_sql_table(table_name, db_name):
+    engine = create_engine(f"sqlite:///{db_name}", echo=False) # Find a way to use this in messages
+    sqlite_conn = engine.connect()
+    df = pd.read_sql_table(
+        table_name,
+        con=sqlite_conn
+    )
+    sqlite_conn.close()
+    return df
+
+def exec_sql_from_file(filename, db_path, sql=None):
+    # Open and read the file as a single buffer
+    fd = open(filename, 'r')
+    query_txt = fd.read()
+    fd.close()
+    # Connect to DB
+    engine = create_engine(f"sqlite:///{db_path}", echo=False)
+    sqlite_conn = engine.connect()
+    # Execute and load table as pandas df
+    df = pd.read_sql(query_txt, con=sqlite_conn)
+    # Close the connection
+    sqlite_conn.close()
+    return df
 
 # WIP: create sequences
 # provide option for summary stats and viz
