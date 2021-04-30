@@ -26,18 +26,8 @@ course_df.columns
 len(course_df['ResearchID'].unique().tolist()) # ~125,000 course sequences
 
 # Prep sequences for Word2Vec 
-# WIP: pandas is not the way to do this on ~1 million records of course histories
-# Try using sql and loading the table after executing ...
-df_sorted = course_df.groupby(
-        ['ResearchID','GradeLevelWhenCourseTaken'], 
-        sort=True).apply(lambda x: x.sort_values(
-        ['GradeLevelWhenCourseTaken','CourseTitle'], 
-        ascending = [False,True])).reset_index(drop=True)
-
-# Test SQL 
-
 columns = ['ResearchID', 'CourseTitle']
-pivot_df = df_sorted[columns]
+pivot_df = course_df[columns]
 
 # WIP: Most promising method so far one row per student and course sequence
 course_list = pivot_df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(x)}).reset_index()
