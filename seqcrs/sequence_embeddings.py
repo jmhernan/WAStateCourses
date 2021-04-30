@@ -30,6 +30,7 @@ columns = ['ResearchID', 'CourseTitle']
 pivot_df = course_df[columns]
 
 # WIP: Most promising method so far one row per student and course sequence
+# NOT EFFICIENT WITH LARGER FILE
 course_list = pivot_df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(x)}).reset_index()
 
 course_seq_ls = course_list['CourseTitle'].to_list() 
