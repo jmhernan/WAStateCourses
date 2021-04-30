@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import CountVectorizer
 import json
+import pandas as pd
+from sqlalchemy import create_engine
 
 def get_top_n_courses(corpus, n=None):
     """
@@ -46,14 +48,19 @@ def load_sql_table(table_name, db_name):
     sqlite_conn.close()
     return df
 
-def exec_sql_from_file(filename, db_path, sql=None):
-    # Open and read the file as a single buffer
-    fd = open(filename, 'r')
-    query_txt = fd.read()
-    fd.close()
+def execute_sql(db_path,sql_filename=None,sql_txt=None):
     # Connect to DB
     engine = create_engine(f"sqlite:///{db_path}", echo=False)
     sqlite_conn = engine.connect()
+
+    if sql_filename is not None:
+        # Open and read the file as a single buffer
+        fd = open(sql_filename, 'r')
+        query_txt = fd.read()
+        fd.close()
+    else:
+        query_txt = sql_txt
+    
     # Execute and load table as pandas df
     df = pd.read_sql(query_txt, con=sqlite_conn)
     # Close the connection
