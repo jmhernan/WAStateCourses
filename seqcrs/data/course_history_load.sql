@@ -9,10 +9,6 @@
     2. Order by courseTitle within grade
 */
 
--- Change Gradelevel to int 
-
-SELECT ResearchID, CourseTitle, GradeLevelWhenCourseTaken
-FROM hsCourses
-GROUP BY ResearchID, GradeLevelWhenCourseTaken
-ORDER BY GradeLevelWhenCourseTaken DESC
-LIMIT 100;
+SELECT ResearchID, GradeLevelWhenCourseTaken, courseTitle
+FROM pre_hsCourses_seq
+ORDER BY ResearchID, GradeLevelWhenCourseTaken, courseTitle ASC;
