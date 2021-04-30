@@ -33,6 +33,9 @@ pivot_df = course_df[columns]
 # NOT EFFICIENT WITH LARGER FILE
 course_list = pivot_df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(x)}).reset_index()
 
+# TRY SQL
+# No PIVOT function in sqlite.
+
 course_seq_ls = course_list['CourseTitle'].to_list() 
 
 course_seq = pp.clean_courses(course_seq_ls)
