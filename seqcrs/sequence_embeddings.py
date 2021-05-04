@@ -2,7 +2,6 @@
 # leverage Sequence Graph Transform embeddings 
 # Compare to word2vec
 # Train on sequences of all courses taken in RMP Region
-
 import pandas as pd
 from sqlalchemy import create_engine
 
@@ -31,20 +30,19 @@ pivot_df = course_df[columns]
 
 # WIP: Most promising method so far one row per student and course sequence
 # NOT EFFICIENT WITH LARGER FILE
-# Try multiprocess...
-def pivot_fun(df):
-    piv_courses = df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(x)}).reset_index() 
-
-course_list = pp.parallelize_df(pivot_df, pivot_fun)
-
-course_list = pivot_df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(x)}).reset_index()
-
+# Try multiprocess 
 # TRY SQL
 # No PIVOT function in sqlite.
+def pivot_fun(df):
+    reshaped_df = df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(x)}).reset_index() 
+    return(reshaped_df)
+
+course_list = pp.parallelize_df(pivot_df, pivot_fun)
 
 course_seq_ls = course_list['CourseTitle'].to_list() 
 
 course_seq = pp.clean_courses(course_seq_ls)
+
 # Word2Vec
 tokenized_text = [word_tokenize(i) for i in corpus]
 
