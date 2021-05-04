@@ -3,6 +3,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 import json
 import pandas as pd
 from sqlalchemy import create_engine
+from multiprocessing import  Pool
 
 def get_top_n_courses(corpus, n=None):
     """
@@ -67,6 +68,13 @@ def execute_sql(db_path,sql_filename=None,sql_txt=None):
     sqlite_conn.close()
     return df
 
+def parallelize_df(df, function, cores=4):
+    df_split = np.array_split(df, cores)
+    pool = Pool(cores)
+    df = pd.concat(pool.map(function, df_split))
+    pool.close()
+    pool.join()
+    return df
 # WIP: create sequences
 # provide option for summary stats and viz
 def to_sequence():
