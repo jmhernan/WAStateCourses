@@ -4,6 +4,7 @@ import json
 import pandas as pd
 from sqlalchemy import create_engine
 from multiprocessing import  Pool
+import numpy as np
 
 def get_top_n_courses(corpus, n=None):
     """

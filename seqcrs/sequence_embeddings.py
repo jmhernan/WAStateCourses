@@ -31,6 +31,12 @@ pivot_df = course_df[columns]
 
 # WIP: Most promising method so far one row per student and course sequence
 # NOT EFFICIENT WITH LARGER FILE
+# Try multiprocess...
+def pivot_fun(df):
+    piv_courses = df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(x)}).reset_index() 
+
+course_list = pp.parallelize_df(pivot_df, pivot_fun)
+
 course_list = pivot_df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(x)}).reset_index()
 
 # TRY SQL
