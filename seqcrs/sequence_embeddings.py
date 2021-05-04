@@ -39,7 +39,8 @@ def pivot_fun(df):
 
 course_list = pp.parallelize_df(pivot_df, pivot_fun)
 
-course_seq_ls = course_list['CourseTitle'].to_list() 
+# very slow inspect
+course_seq_ls = course_list['CourseTitle'].to_list()
 
 course_seq = pp.clean_courses(course_seq_ls)
 
