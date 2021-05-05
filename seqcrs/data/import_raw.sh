@@ -1,9 +1,9 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 
 
-export PROJECTDIR=$HOME/Documents/eScience/projects/WAStateCourses  
+export PROJECTDIR=$HOME/source/WAStateCourses  
 export CODEDIR=$PROJECTDIR/seqcrs
-export CCER_DATA_DUMP=$HOME/Documents/eScience/data/CCER_cadrs/cadrs_collaboration_data_update
+export CCER_DATA_DUMP=$HOME/data
 export DB_PATH=$PROJECTDIR/data/ccer_data.db
 
 rm -f DB_PATH
