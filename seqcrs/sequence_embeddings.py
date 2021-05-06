@@ -13,6 +13,10 @@ sys.path.insert(1, preprocess_path)
 
 import preprocessing as pp
 
+from nltk.tokenize import word_tokenize
+
+from gensim.models import Word2Vec
+
 data_path = os.path.join(project_root, "data") + '/'
 
 wastate_db = data_path + 'ccer_data.db'
@@ -39,16 +43,13 @@ def pivot_fun(df):
 
 course_list = pp.parallelize_df(pivot_df, pivot_fun)
 
-# very slow inspect
+# very slow inspect try with reduced sample
 course_seq_ls = course_list['CourseTitle'].to_list()
 
 course_seq = pp.clean_courses(course_seq_ls)
 
-# Word2Vec
-tokenized_text = [word_tokenize(i) for i in corpus]
-
 # word embedding model
-model_baseline = Word2Vec(tokenized_text, min_count=1) 
+model_baseline = Word2Vec(course_seq, min_count=1) 
 
 len(list(model_baseline.wv.vocab))
 
@@ -57,9 +58,14 @@ model_baseline.wv.index2entity[:100] # same as top_n words
 
 # Build a function
 keywords = [
-    'algebra',
     'calculus'
 ]
 
+def get_similar_words(list_words, top, wb_model):
+    list_out = list_words
+    for w in wb_model.most_similar(list_words, topn=top):
+        list_out.append(w[0])
+    return list(set(list_out))
+
 # gets combination 
-tp.get_similar_words(keywords, 10, model_baseline)
+get_similar_words(keywords, 10, model_baseline)
