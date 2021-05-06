@@ -49,7 +49,7 @@ course_seq_ls = course_list['CourseTitle'].to_list()
 course_seq = pp.clean_courses(course_seq_ls)
 
 # word embedding model
-model_baseline = Word2Vec(course_seq, min_count=1) 
+model_baseline = Word2Vec(course_seq) 
 
 len(list(model_baseline.wv.vocab))
 
