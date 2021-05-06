@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import CountVectorizer
 import json
