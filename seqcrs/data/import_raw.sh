@@ -11,7 +11,7 @@ rm -f DB_PATH
 for file in $CCER_DATA_DUMP/*.txt
     do
 
-        "echo .seperator |"; echo ".import ${file} $(basename ${file} | cut -d. -f1) | sqlite3 $DB_PATH"
+        echo ".seperator |"; echo ".import ${file} $(basename ${file} | cut -d. -f1) | sqlite3 $DB_PATH"
 
     done
 
