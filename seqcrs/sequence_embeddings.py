@@ -2,19 +2,23 @@
 # leverage Sequence Graph Transform embeddings 
 # Compare to word2vec
 # Train on sequences of all courses taken in RMP Region
+import os
+import re
+import sys
+
 import pandas as pd
 from sqlalchemy import create_engine
 
 this_file_path = os.path.abspath(__file__)
-project_root = os.path.split(os.path.split(this_file_path)[0])[0]
-
-preprocess_path = os.path.split(this_file_path)[0]
-sys.path.insert(1, preprocess_path)
+this_file_path = '/home/ubuntu/source/WAStateCourses/seqcrs/data/sequence_embeddings.py'
+project_root = os.path.split(os.path.split(os.path.split(this_file_path)[0])[0])[0]
 
 import preprocessing as pp
 
 from nltk.tokenize import word_tokenize
 
+import smart_open
+smart_open.open = smart_open.smart_open
 from gensim.models import Word2Vec
 
 data_path = os.path.join(project_root, "data") + '/'
@@ -38,7 +42,7 @@ pivot_df = course_df[columns]
 # TRY SQL
 # No PIVOT function in sqlite.
 def pivot_fun(df):
-    reshaped_df = df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(x)}).reset_index() 
+    reshaped_df = df.groupby('ResearchID').agg({'CourseTitle':lambda x: list(x)}).reset_index()
     return(reshaped_df)
 
 course_list = pp.parallelize_df(pivot_df, pivot_fun)
@@ -51,21 +55,21 @@ course_seq = pp.clean_courses(course_seq_ls)
 # word embedding model
 model_baseline = Word2Vec(course_seq) 
 
+model_baseline.save('course_baseline_model.bin')
+
 len(list(model_baseline.wv.vocab))
 
 # 100 most occuring 
-model_baseline.wv.index2entity[:100] # same as top_n words
+model_baseline.wv.index2entity[:500] # same as top_n words
 
 # Build a function
 keywords = [
-    'calculus'
+    'career_choices'
 ]
 
 def get_similar_words(list_words, top, wb_model):
-    list_out = list_words
-    for w in wb_model.most_similar(list_words, topn=top):
-        list_out.append(w[0])
-    return list(set(list_out))
+    list_out = wb_model.wv.most_similar(list_words, topn=top)
+    return list_out
 
 # gets combination 
-get_similar_words(keywords, 10, model_baseline)
+get_similar_words(keywords, 20, model_baseline)
