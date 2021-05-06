@@ -10,7 +10,7 @@ rm -f DB_PATH
 
 for file in $CCER_DATA_DUMP/*.txt
 do
-    (echo .seperator | .import ${file} $(basename ${file} | cut -d. -f1)) | sqlite3 $DB_PATH
+    ("echo .seperator |"; echo ".import ${file} $(basename ${file} | cut -d. -f1))" | sqlite3 $DB_PATH
 done
 
 sqlite3 $DB_PATH '.read '${CODEDIR}'/data/create_cohort.sql'
