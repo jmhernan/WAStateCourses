@@ -16,7 +16,6 @@ done
 
 sqlite3 $DB_PATH '.read '${CODEDIR}'/data/create_cohort.sql'
 sqlite3 $DB_PATH '.read '${CODEDIR}'/data/nsc_coverage.sql'
-sqlite3 $DB_PATH '.read '${CODEDIR}'/data/pre_hsCourses.sql'
 
 # WIP Some message about rows imported
 sqlite3 -batch $DB_PATH << SQL
@@ -26,3 +25,5 @@ SELECT COUNT(*) FROM Dim_School;
 SELECT COUNT(*) FROM hsCourses;
 SELECT COUNT(*) FROM postSecDems;
 SQL
+
+sqlite3 $DB_PATH '.read '${CODEDIR}'/data/pre_hsCourses.sql'
