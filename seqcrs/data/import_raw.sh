@@ -24,5 +24,3 @@ SELECT COUNT(*) FROM Dim_School;
 SELECT COUNT(*) FROM hsCourses;
 SELECT COUNT(*) FROM postSecDems;
 SQL
-
-.separator "|"
