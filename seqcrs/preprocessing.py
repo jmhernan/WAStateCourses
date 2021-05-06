@@ -23,6 +23,10 @@ def get_metadata_dict(metadata_file):
     return metadata
 
 def clean_courses(text_ls):
+    """
+    WIP: output produces a list of tokenized courses but 
+    is this what is needed for model training and word vectors?
+    """
     crs_ls = [[x.strip() for x in l] for l in text_ls] 
     crs_ls = [[x.replace('(', '') for x in l] for l in crs_ls]
     crs_ls = [[x.replace(')', '') for x in l] for l in crs_ls]
@@ -31,8 +35,8 @@ def clean_courses(text_ls):
     crs_ls = [[x.replace('/', '_') for x in l] for l in crs_ls]
     crs_ls = [[x.replace('-', '') for x in l] for l in crs_ls]
     crs_ls = [[x.replace(' ', '_') for x in l] for l in crs_ls]
-    crs_ls = [[" ".join(w for w in l)] for l in crs_ls]
-    crs_ls = [x for sublist in crs_ls for x in sublist] 
+    #crs_ls = [[" ".join(w for w in l)] for l in crs_ls]
+    #crs_ls = [x for sublist in crs_ls for x in sublist] 
     return crs_ls
 
 # WIP: 
@@ -76,6 +80,13 @@ def parallelize_df(df, function, cores=4):
     pool.close()
     pool.join()
     return df
+
+def get_similar_words(list_words, top, wb_model):
+    list_out = list_words
+    for w in wb_model.most_similar(list_words, topn=top):
+        list_out.append(w[0])
+    return list(set(list_out))
+
 # WIP: create sequences
 # provide option for summary stats and viz
 def to_sequence():
