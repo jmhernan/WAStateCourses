@@ -24,7 +24,7 @@ def get_metadata_dict(metadata_file):
     metadata = json.loads(metadata_handle.read())
     return metadata
 
-def clean_courses(text_ls):
+def clean_courses(text_ls, tokenize=True):
     """
     WIP: output produces a list of tokenized courses but 
     is this what is needed for model training and word vectors?
@@ -37,9 +37,12 @@ def clean_courses(text_ls):
     crs_ls = [[x.replace('/', '_') for x in l] for l in crs_ls]
     crs_ls = [[x.replace('-', '') for x in l] for l in crs_ls]
     crs_ls = [[x.replace(' ', '_') for x in l] for l in crs_ls]
-    #crs_ls = [[" ".join(w for w in l)] for l in crs_ls]
-    #crs_ls = [x for sublist in crs_ls for x in sublist] 
-    return crs_ls
+    if tokenize is True:
+        return crs_ls
+    else:
+        crs_ls = [[" ".join(w for w in l)] for l in crs_ls]
+        crs_ls = [x for sublist in crs_ls for x in sublist] 
+        return crs_ls
 
 # WIP: 
 # 1. Load raw data tables ✅
