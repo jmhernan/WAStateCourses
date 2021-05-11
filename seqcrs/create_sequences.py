@@ -115,10 +115,11 @@ sum(results_df['cadr_sum'])
 # 2. Lower Case
 course_seq_ls = course_list['CourseTitle'].to_list() 
 
-course_seq = pp.clean_courses(course_seq_ls)
+course_seq = pp.clean_courses(course_seq_ls, tokenize=False)
 
 # Check sequence distribution for Tukwila  
 course_cnt = pp.get_top_n_courses(course_seq, n=100)
+
 type(course_cnt)
 
 course_name = list(zip(*course_cnt))[0]
