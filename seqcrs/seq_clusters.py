@@ -27,7 +27,7 @@ wastate_db = data_path + 'ccer_data.db'
 sql_script = project_root + '/seqcrs/data/course_history_load.sql'
 
 course_df = pp.execute_sql(sql_filename=sql_script, db_path=wastate_db)
-df_cls = course_df[1:1000]
+df_cls = course_df[1:10000]
 
 columns = ['ResearchID', 'CourseTitle']
 pivot_df = df_cls[columns]
@@ -42,7 +42,7 @@ course_list = pp.parallelize_df(pivot_df, pivot_fun)
 course_seq_ls = course_list['CourseTitle'].to_list()
 
 course_seq = pp.clean_courses(course_seq_ls)
-
+len(course_seq)
 # Word embedding model
 # Load model trained on universe of transcripts
 model_baseline = Word2Vec(course_seq, min_count=1) 
@@ -128,5 +128,5 @@ def vectorize_courses(list_of_courses, w2v_model):
             features.append(zero_vector)
     return features
     
-vectorized_courses = vectorize_courses(tokenized_courses, model=model)
+vectorized_courses = vectorize_courses(course_seq, w2v_model=model_baseline)
 len(vectorized_courses), len(vectorized_courses[0])
