@@ -100,3 +100,32 @@ def to_sequence():
 # WIP: save to sql db
 def save_to_db():
     pass
+
+def vectorize_courses(list_of_courses, w2v_model):
+    """Generate vectors for list of courses using a word embedding
+
+    Args:
+        list_of_courses: List of course sequences
+        w2v_model: Trained word embedding model
+
+    Returns:
+        List of course vectors
+    """
+    features = []
+
+    for tokens in list_of_courses:
+        zero_vector = np.zeros(w2v_model.vector_size)
+        vectors = []
+        for token in tokens:
+            if token in w2v_model.wv:
+                try:
+                    vectors.append(w2v_model.wv[token])
+                except KeyError:
+                    continue
+        if vectors:
+            vectors = np.asarray(vectors)
+            avg_vec = vectors.mean(axis=0)
+            features.append(avg_vec)
+        else:
+            features.append(zero_vector)
+    return features
