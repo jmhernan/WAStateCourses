@@ -3,6 +3,8 @@ WIP:Cluster Sequences
 =================
 Cluster course sequences using Word2Vec model embeddings. You need to train 
 model by running sequence_embeddings.py
+Code adapted from Dylan Castillo:
+https://dylancastillo.co/nlp-snippets-cluster-documents-using-word2vec/#generate-document-vectors
 """
 import numpy as np 
 
