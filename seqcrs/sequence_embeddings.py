@@ -55,6 +55,7 @@ course_seq = pp.clean_courses(course_seq_ls)
 # word embedding model
 model_baseline = Word2Vec(course_seq) 
 
+#WIP: don't save the whole model if you are done training
 model_baseline.save('course_baseline_model.bin')
 
 len(list(model_baseline.wv.vocab))
