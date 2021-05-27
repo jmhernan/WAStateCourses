@@ -21,7 +21,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 
 from sqlalchemy import create_engine
-import lstm_utils as lu 
+import nn_utils as nn 
 
 this_file_path = os.path.abspath(__file__)
 project_root = os.path.split(this_file_path)[0]
@@ -67,7 +67,7 @@ num_words_row = [len(words.split()) for words in crs_seq]
 max_seq_len = max(num_words_row)
 
 # Tokenize
-word_index, sequences = lu.tokenize_seq(crs_seq)
+word_index, sequences = nn.tokenize_seq(crs_seq)
 print('Found %s unique tokens.' % len(word_index))
 vocab_size = 350
 
@@ -110,26 +110,5 @@ plt.ylim(0,None)
 # WIP PREDICTIONS
 # predictions = model.predict(np.array([sample_courses])) 
 
-# Another layer
-model_2 = lu.model_build(vocab_size=vocab_size, hidden_layers=2)
-
-model_2.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
-              optimizer=tf.keras.optimizers.Adam(1e-4),
-              metrics=['accuracy'])
-
-history = model_2.fit(x_train, y_train, epochs=30,
-                    batch_size=32,
-                    validation_data=(x_val, y_val))
-
-test_loss, test_acc = model_2.evaluate(x_val, y_val)
-
-print('Test Loss: {}'.format(test_loss))
-print('Test Accuracy: {}'.format(test_acc))
-
-plt.figure(figsize=(16,8))
-plt.subplot(1,2,1)
-lu.plot_graphs(history, 'accuracy')
-plt.ylim(None,1)
-plt.subplot(1,2,2)
-lu.plot_graphs(history, 'loss')
-plt.ylim(0,None)
+# Word embeddings 
+model = gensim.models.KeyedVectors.load_word2vec_format('path/to/file')

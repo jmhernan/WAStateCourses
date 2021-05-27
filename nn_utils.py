@@ -8,26 +8,17 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 class callbackLimit():
     pass
 
-def model_build(vocab_size, embedding_dim=64, dropout=.50, hidden_layers=1, nodes = 100):
-    if hidden_layers > 1:
-        model = tf.keras.Sequential([
-        tf.keras.layers.Embedding(vocab_size, embedding_dim, mask_zero=True),
-        tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(nodes,  return_sequences=True)),
-        tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(nodes)),
-        tf.keras.layers.Dense(embedding_dim, activation='relu'),
-        tf.keras.layers.Dropout(dropout),
-        tf.keras.layers.Dense(1, activation='sigmoid')])
-    else:
-        model = tf.keras.Sequential([
-        tf.keras.layers.Embedding(vocab_size, embedding_dim, mask_zero=True),
-        tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(nodes)),
-        tf.keras.layers.Dense(embedding_dim, activation='relu'),
-        tf.keras.layers.Dropout(dropout),
-        tf.keras.layers.Dense(1, activation='sigmoid')])
+def lstm_model_build(vocab_size, embedding_dim=64, dropout=.50, nodes = 100, embedding_training=True):
+    model = tf.keras.Sequential([
+    tf.keras.layers.Embedding(vocab_size, embedding_dim, mask_zero=True),
+    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(nodes)),
+    tf.keras.layers.Dense(embedding_dim, activation='relu'),
+    tf.keras.layers.Dropout(dropout),
+    tf.keras.layers.Dense(1, activation='sigmoid')])
     return model
 
 
-def train_model():
+def train_model(model):
     pass
 
 # Tokenize
