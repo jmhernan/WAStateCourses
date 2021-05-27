@@ -21,9 +21,9 @@ def lstm_model_build(vocab_size, embedding_dim=64, dropout=.50, nodes = 100, emb
 def train_model(model):
     pass
 
-# Tokenize
+# Tokenize WIP not returning desired output...
 def tokenize_seq(input_txt):
-    tokenizer = Tokenizer()
+    tokenizer = Tokenizer(filters=' ')
     tokenizer.fit_on_texts(input_txt)
     word_index = tokenizer.word_index
     sequences = tokenizer.texts_to_sequences(input_txt) # word and their token # ordered by most frequent
