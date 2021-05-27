@@ -133,6 +133,7 @@ model.__getitem__('algebra_1')
 word_vector_dim=100
 embedding_matrix = np.zeros((len(word_index) + 1, word_vector_dim))
 
+# WIP
 for word, i in word_index.items():
     if i >= len(word_index) + 1:
         continue
