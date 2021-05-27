@@ -20,11 +20,20 @@ from tensorflow.keras import utils
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 
+import smart_open
+smart_open.open = smart_open.smart_open
+from gensim.models import Word2Vec
+from gensim.test.utils import datapath
+
 from sqlalchemy import create_engine
-import nn_utils as nn 
 
 this_file_path = os.path.abspath(__file__)
+this_file_path = '/home/ubuntu/source/WAStateCourses/LSTM_seq.py'
 project_root = os.path.split(this_file_path)[0]
+
+sys.path.insert(1, project_root)
+
+import nn_utils as nn
 
 data_path = os.path.join(project_root, "data") + '/'
 
@@ -68,8 +77,14 @@ max_seq_len = max(num_words_row)
 
 # Tokenize
 word_index, sequences = nn.tokenize_seq(crs_seq)
+# TRY
+tokenizer = Tokenizer(filters=' ')
+tokenizer.fit_on_texts(crs_seq)
+word_index = tokenizer.word_index
+sequences = tokenizer.texts_to_sequences(crs_seq) # word and their token # ordered by most frequent
+
 print('Found %s unique tokens.' % len(word_index))
-vocab_size = 350
+vocab_size = 450
 
 # Padding
 seq_pad = pad_sequences(sequences, maxlen=max_seq_len+1)
@@ -84,7 +99,7 @@ x_train, x_val, y_train, y_val = train_test_split(seq_pad, label,
 
 # Build model
 
-model = lu.model_build(vocab_size=vocab_size)
+model = nn.lstm_model_build(vocab_size=vocab_size)
 
 model.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
               optimizer=tf.keras.optimizers.Adam(1e-4),
@@ -111,4 +126,23 @@ plt.ylim(0,None)
 # predictions = model.predict(np.array([sample_courses])) 
 
 # Word embeddings 
-model = gensim.models.KeyedVectors.load_word2vec_format('path/to/file')
+model = Word2Vec.load(datapath('/home/ubuntu/source/WAStateCourses/seqcrs/course_baseline_model.bin'))
+model.wv.most_similar('fine_arts', topn=10) #WIP double underscore
+model.__getitem__('algebra_1')
+# create embedding matrix
+word_vector_dim=100
+embedding_matrix = np.zeros((len(word_index) + 1, word_vector_dim))
+
+for word, i in word_index.items():
+    if i >= len(word_index) + 1:
+        continue
+    try:
+        embedding_vector = model.__getitem__[word]
+        embedding_matrix[i] = embedding_vector
+    except KeyError:
+        embedding_matrix[i]=np.random.normal(0,np.sqrt(0.25),word_vector_dim)
+# WIP Fix tokenizer
+crs_seq
+tokenizer = Tokenizer(filters=' ')
+tokenizer.fit_on_texts(crs_seq)
+word_index = tokenizer.word_index
