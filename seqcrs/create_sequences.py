@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 import numpy as np
 import pandas as pd
-import json#
+import json
 import os
 import re
 import sys
 from pathlib import Path
 import sqlite3
-from sklearn.feature_extraction.text import CountVectorizer#
+from sklearn.feature_extraction.text import CountVectorizer
 
 import matplotlib.pyplot as plt
 from sqlalchemy import create_engine
@@ -16,9 +16,7 @@ from sqlalchemy.types import NVARCHAR, Integer, Text
 import time
 
 this_file_path = os.path.abspath(__file__)
-
-preprocess_path = os.path.split(os.path.split(this_file_path)[0])[0]
-sys.path.insert(1, preprocess_path)
+this_file_path = '/home/ubuntu/source/WAStateCourses/seqcrs/create_sequences.py'
 
 project_root = os.path.split(os.path.split(this_file_path)[0])[0]
 
@@ -151,17 +149,15 @@ plt.show()
 # Save to SQL DB
 results_df['course_seq'] = course_seq
 df_sql = results_df.drop(['CourseTitle'], axis=1)
-# save 
-from sqlalchemy import create_engine
-from sqlalchemy.types import NVARCHAR, Integer, Text
 
+# save 
 engine = create_engine(f"sqlite:///{wastate_db}", echo=True)
 sqlite_connection = engine.connect()
 
-sql_table = "sequence_processed"
+sql_table = "tuk_sequence_processed"
 df_sql.to_sql(sql_table, sqlite_connection, if_exists='replace',
     dtype = {'ResearchID':NVARCHAR(), 'cadr_sum':Integer(), 'course_seq':NVARCHAR()})
 
-engine.execute("SELECT * FROM sequence_processed limit 10").fetchall()
+engine.execute("SELECT * FROM tuk_sequence_processed limit 10").fetchall()
 
 sqlite_connection.close()
