@@ -10,8 +10,9 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 this_file_path = os.path.abspath(__file__)
-this_file_path = '/home/ubuntu/source/WAStateCourses/seqcrs/data/sequence_embeddings.py'
-project_root = os.path.split(os.path.split(os.path.split(this_file_path)[0])[0])[0]
+project_root = os.path.split(os.path.split(this_file_path)[0])[0]
+# this_file_path = '/home/ubuntu/source/WAStateCourses/seqcrs/data/sequence_embeddings.py'
+# project_root = os.path.split(os.path.split(os.path.split(this_file_path)[0])[0])[0]
 
 import preprocessing as pp
 
@@ -28,6 +29,7 @@ wastate_db = data_path + 'ccer_data.db'
 sql_script = project_root + '/seqcrs/data/course_history_load.sql'
 
 course_df = pp.execute_sql(sql_filename=sql_script, db_path=wastate_db)
+df_cls = course_df[1:250000] # subset for testing purposes
 
 course_df.columns
 len(course_df['ResearchID'].unique().tolist()) # ~125,000 course sequences
