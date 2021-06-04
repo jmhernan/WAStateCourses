@@ -214,3 +214,6 @@ most_representative_docs = np.argsort(
 for d in most_representative_docs[:5]:
     print(course_seq_ls[d])
     print("-------------")
+
+# Add word embedding visualization
+# T-SNE or similar
