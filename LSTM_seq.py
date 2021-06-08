@@ -44,7 +44,7 @@ engine = create_engine(f"sqlite:///{wastate_db}", echo=True)
 sqlite_conn = engine.connect()
 
 model_df = pd.read_sql_table(
-    'tuk_sequence_processed',
+    'sequence_processed',
     con=sqlite_conn
 )
 
@@ -60,7 +60,7 @@ def load_sql_table(table_name, db_name):
     sqlite_conn.close()
     return df
 
-model_df = load_sql_table(table_name='tuk_sequence_processed', db_name=wastate_db)
+model_df = load_sql_table(table_name='sequence_processed', db_name=wastate_db)
 # use the subject class as the label
 # For encoder layer
 # 1. Split the data into Test, Train
@@ -124,7 +124,7 @@ plt.ylim(0,None)
 embeddings_test = '/Users/josehernandez/Documents/eScience/projects/WAStateCourses/seqcrs/course_baseline_model_test.bin'
 embeddings_aws = '/home/ubuntu/source/WAStateCourses/seqcrs/course_baseline_model.bin'
 
-model = Word2Vec.load(datapath(embeddings_test))
+model = Word2Vec.load(datapath(embeddings_aws))
 model.wv.most_similar('fine_arts', topn=10) #WIP double underscore
 model.wv.__getitem__('algebra_1')
 # create embedding matrix
