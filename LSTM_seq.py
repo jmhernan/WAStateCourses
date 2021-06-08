@@ -44,7 +44,7 @@ engine = create_engine(f"sqlite:///{wastate_db}", echo=True)
 sqlite_conn = engine.connect()
 
 model_df = pd.read_sql_table(
-    'sequence_processed',
+    'tuk_sequence_processed',
     con=sqlite_conn
 )
 
@@ -60,7 +60,7 @@ def load_sql_table(table_name, db_name):
     sqlite_conn.close()
     return df
 
-model_df = load_sql_table(table_name='sequence_processed', db_name=wastate_db)
+model_df = load_sql_table(table_name='tuk_sequence_processed', db_name=wastate_db)
 # use the subject class as the label
 # For encoder layer
 # 1. Split the data into Test, Train
@@ -77,24 +77,19 @@ max_seq_len = max(num_words_row)
 
 # Tokenize
 word_index, sequences = nn.tokenize_seq(crs_seq)
-# TRY
-tokenizer = Tokenizer(filters=' ')
-tokenizer.fit_on_texts(crs_seq)
-word_index = tokenizer.word_index
-sequences = tokenizer.texts_to_sequences(crs_seq) # word and their token # ordered by most frequent
 
 print('Found %s unique tokens.' % len(word_index))
-vocab_size = 450
+vocab_size = len(word_index) + 1
 
 # Padding
 seq_pad = pad_sequences(sequences, maxlen=max_seq_len+1)
 seq_pad.shape
 
 # Outcome 
-y_label = to_categorical(np.asarray(label))
+y_label = np.asarray(label)
 
 # Prep test and training 
-x_train, x_val, y_train, y_val = train_test_split(seq_pad, label,
+x_train, x_val, y_train, y_val = train_test_split(seq_pad, y_label,
     test_size=0.2, random_state = 42)
 
 # Build model
@@ -116,34 +111,62 @@ print('Test Accuracy: {}'.format(test_acc))
 
 plt.figure(figsize=(16,8))
 plt.subplot(1,2,1)
-lu.plot_graphs(history, 'accuracy')
+nn.plot_graphs(history, 'accuracy')
 plt.ylim(None,1)
 plt.subplot(1,2,2)
-lu.plot_graphs(history, 'loss')
+nn.plot_graphs(history, 'loss')
 plt.ylim(0,None)
 
 # WIP PREDICTIONS
 # predictions = model.predict(np.array([sample_courses])) 
 
 # Word embeddings 
-model = Word2Vec.load(datapath('/home/ubuntu/source/WAStateCourses/seqcrs/course_baseline_model.bin'))
+embeddings_test = '/Users/josehernandez/Documents/eScience/projects/WAStateCourses/seqcrs/course_baseline_model_test.bin'
+embeddings_aws = '/home/ubuntu/source/WAStateCourses/seqcrs/course_baseline_model.bin'
+
+model = Word2Vec.load(datapath(embeddings_test))
 model.wv.most_similar('fine_arts', topn=10) #WIP double underscore
-model.__getitem__('algebra_1')
+model.wv.__getitem__('algebra_1')
 # create embedding matrix
 word_vector_dim=100
 embedding_matrix = np.zeros((len(word_index) + 1, word_vector_dim))
 
-# WIP
-for word, i in word_index.items():
-    if i >= len(word_index) + 1:
-        continue
-    try:
-        embedding_vector = model.__getitem__[word]
-        embedding_matrix[i] = embedding_vector
-    except KeyError:
-        embedding_matrix[i]=np.random.normal(0,np.sqrt(0.25),word_vector_dim)
-# WIP Fix tokenizer
-crs_seq
-tokenizer = Tokenizer(filters=' ')
-tokenizer.fit_on_texts(crs_seq)
-word_index = tokenizer.word_index
+
+def populate_embeddings(vocabulary_index, word_vector_dim, wv_model):
+    embedding_matrix = np.zeros((len(vocabulary_index) + 1, word_vector_dim))
+    for word, i in word_index.items():
+        if i >= len(vocabulary_index) + 1:
+            continue
+        try:
+            embedding_vector = wv_model.wv.__getitem__(word)
+            embedding_matrix[i] = embedding_vector
+        except KeyError: # Catch non-vocabulary KeyErrors and populate with zeros...
+            embedding_matrix[i]=np.zeros(word_vector_dim)
+    return embedding_matrix
+
+emb_matrix = populate_embeddings(vocabulary_index=word_index,word_vector_dim=100, wv_model = model)
+
+# CHECK ZERO ENTRIES
+nonzero_elements = np.count_nonzero(np.count_nonzero(emb_matrix, axis=1))
+nonzero_elements / len(word_index)
+
+# WIP: add to model 
+vocab_size = len(word_index) + 1
+embedding_dim=100 
+dropout=.50 
+nodes = 100
+
+model = tf.keras.Sequential([
+    tf.keras.layers.Embedding(input_dim = vocab_size, output_dim  = embedding_dim, embeddings_initializer = tf.keras.initializers.Constant(emb_matrix), trainable = False),
+    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(nodes)),
+    tf.keras.layers.Dense(embedding_dim, activation='relu'),
+    tf.keras.layers.Dropout(dropout),
+    tf.keras.layers.Dense(1, activation='sigmoid')])
+
+model.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+              optimizer=tf.keras.optimizers.Adam(1e-4),
+              metrics=['accuracy'])
+
+history = model.fit(x_train, y_train, epochs=50,
+                    batch_size=32,
+                    validation_data=(x_val, y_val))
