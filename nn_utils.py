@@ -39,7 +39,8 @@ def lstm_model_build(vocab_size, embedding_dim=64, dropout=.50, nodes = 100,
         model = tf.keras.Sequential([
         tf.keras.layers.Embedding(input_dim = vocab_size, 
                                   output_dim  = embedding_dim, 
-                                  embeddings_initializer = tf.keras.initializers.Constant(embedding_matrix), 
+                                  embeddings_initializer = \
+                                  tf.keras.initializers.Constant(embedding_matrix), 
                                   trainable = False),
         tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(nodes)),
         tf.keras.layers.Dense(embedding_dim, activation='relu'),
