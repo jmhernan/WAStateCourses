@@ -90,7 +90,7 @@ y_label = np.asarray(label)
 
 # Prep test and training 
 x_train, x_val, y_train, y_val = train_test_split(seq_pad, y_label,
-    test_size=0.2, random_state = 42)
+    test_size=0.2, random_state = 42, stratify =y_label)
 
 # Build model
 
@@ -124,49 +124,26 @@ plt.ylim(0,None)
 embeddings_test = '/Users/josehernandez/Documents/eScience/projects/WAStateCourses/seqcrs/course_baseline_model_test.bin'
 embeddings_aws = '/home/ubuntu/source/WAStateCourses/seqcrs/course_baseline_model.bin'
 
-model = Word2Vec.load(datapath(embeddings_aws))
+model = Word2Vec.load(datapath(embeddings_test))
 model.wv.most_similar('fine_arts', topn=10) #WIP double underscore
 model.wv.__getitem__('algebra_1')
+
 # create embedding matrix
-word_vector_dim=100
-embedding_matrix = np.zeros((len(word_index) + 1, word_vector_dim))
-
-
-def populate_embeddings(vocabulary_index, word_vector_dim, wv_model):
-    embedding_matrix = np.zeros((len(vocabulary_index) + 1, word_vector_dim))
-    for word, i in word_index.items():
-        if i >= len(vocabulary_index) + 1:
-            continue
-        try:
-            embedding_vector = wv_model.wv.__getitem__(word)
-            embedding_matrix[i] = embedding_vector
-        except KeyError: # Catch non-vocabulary KeyErrors and populate with zeros...
-            embedding_matrix[i]=np.zeros(word_vector_dim)
-    return embedding_matrix
-
-emb_matrix = populate_embeddings(vocabulary_index=word_index,word_vector_dim=100, wv_model = model)
+emb_matrix = nn.populate_embeddings(vocabulary_index=word_index,word_vector_dim=100, wv_model = model)
 
 # CHECK ZERO ENTRIES
 nonzero_elements = np.count_nonzero(np.count_nonzero(emb_matrix, axis=1))
 nonzero_elements / len(word_index)
 
-# WIP: add to model 
+# Build Model with pre-trained embeddings
 vocab_size = len(word_index) + 1
-embedding_dim=100 
-dropout=.50 
-nodes = 100
+model_wb = nn.lstm_model_build(vocab_size=vocab_size, embedding_dim=emb_matrix.shape[1],
+                            embedding_matrix=emb_matrix)
 
-model = tf.keras.Sequential([
-    tf.keras.layers.Embedding(input_dim = vocab_size, output_dim  = embedding_dim, embeddings_initializer = tf.keras.initializers.Constant(emb_matrix), trainable = False),
-    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(nodes)),
-    tf.keras.layers.Dense(embedding_dim, activation='relu'),
-    tf.keras.layers.Dropout(dropout),
-    tf.keras.layers.Dense(1, activation='sigmoid')])
-
-model.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+model_wb.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
               optimizer=tf.keras.optimizers.Adam(1e-4),
               metrics=['accuracy'])
 
-history = model.fit(x_train, y_train, epochs=50,
+history = model_wb.fit(x_train, y_train, epochs=50,
                     batch_size=32,
                     validation_data=(x_val, y_val))
