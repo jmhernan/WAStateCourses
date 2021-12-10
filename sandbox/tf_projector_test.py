@@ -17,7 +17,7 @@ import tensorflow as tf
 embeddings_aws = '/home/ubuntu/source/WAStateCourses/seqcrs/course_baseline_model.bin'
 
 #WIP double underscore, periods
-model = Word2Vec.load(datapath(embeddings_test))
+model = Word2Vec.load(datapath(embeddings_aws))
 model.wv.most_similar('geometry', topn=10) 
 model.wv.__getitem__('algebra_1')
 
@@ -35,5 +35,6 @@ for index, word in enumerate(words):
     vec = weights[index]
     out_v.write('\t'.join([str(x) for x in vec]) + "\n")
     out_m.write(word + "\n")
+
 out_v.close()
 out_m.close()
