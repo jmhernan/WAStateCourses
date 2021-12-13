@@ -14,7 +14,8 @@ root_dir = os.path.abspath(os.getcwd())
 raw_data_dir = os.path.join(root_dir, 'data/ccer_data_10_2021/cadrs_collaboration_data_2021_10_05/')
 project_root = os.path.join(root_dir, 'source/WAStateCourses')
 
-raw_files = [f for f in os.listdir(raw_data_dir) if os.path.isfile(os.path.join(raw_data_dir, f))]
+# WIP CHANGE NO TO CAPS!
+raw_files = [f for f in os.listdir(raw_data_dir) if os.path.isfile(os.path.join(raw_data_dir, f))] 
 
 # WIP: Import dict with database info 
 json_file = open(os.path.join(project_root,"data/db_credentials.json"))
