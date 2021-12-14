@@ -4,6 +4,9 @@ from posixpath import splitext
 import sys
 from pathlib import Path
 import json
+import re
+from matplotlib.pyplot import table
+import time
 
 import pandas as pd
 from sqlalchemy import create_engine
@@ -29,18 +32,35 @@ password = db_cred['password']
 # WIP 
 engine = create_engine(f'postgresql://{user}:{password}@localhost/{db_name}', echo=False) # Find a way to use this in messages
 
-psql_conn = engine.connect()
-
 # Add Data
+t0 = time.time()
 df = pd.read_csv(
-    os.path.join(raw_data_dir, raw_files[6]),
+    os.path.join(raw_data_dir, raw_files[4]),
     sep='|'
 )
+t1 = time.time()
+t1-t0
 
+index = df.index
+len(index)
+# Need to make nae postgres friendly 
+
+def postgres_names(raw_name):
+    pattern_1 = re.compile(r'(.)([A-Z][a-z]+)')
+    pattern_2 = re.compile(r'([a-z0-9])([A-Z])')
+    raw_name = re.sub('_', '', raw_name)
+    name = pattern_1.sub(r'\1_\2', raw_name)
+    lower_name = pattern_2.sub(r'\1_\2', name).lower() 
+    table_name = lower_name.rsplit('.', 1)[0] 
+    return table_name
+
+t0 = time.time()
 df.to_sql(
-    os.path.splitext(raw_files[6])[0], 
+    postgres_names(raw_files[4]), 
     engine,
-    index=False 
+    index=False,
+    if_exists="replace", 
+    chunksize=100000 
 )
-
-psql_conn.close()
+t1 = time.time()
+t1-t0
