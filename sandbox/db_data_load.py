@@ -48,6 +48,7 @@ def postgres_names(raw_name):
     lower_name = pattern_2.sub(r'\1_\2', name).lower() 
     table_name = lower_name.rsplit('.', 1)[0] 
     return table_name
+
 raw_files = [raw_files[5], raw_files[3]]
 meta_dict = {}
 
@@ -82,14 +83,19 @@ for i,n in enumerate(raw_files):
 
 # WIP: test files and column names row errors
 #raw_files_test = raw_files[0],raw_files[3]
-dataset_metadata = {}
-# loop through all the files 
 for i, n in enumerate(raw_files):
-    with open(os.path.join(raw_data_dir,n), 'r') as temp_f:
-        col_count = [ len(l.split("|")) for l in temp_f.readlines() ]
-    list_mean = sum(col_count)/len(col_count)
-    if float(list_mean).is_integer(): 
-        dataset_metadata[n]=[max(col_count)]
-    else:
-        inx_rows = [i for i, x in enumerate(col_count) if x==max(col_count)]
-        dataset_metadata[n]=[min(col_count),max(col_count), inx_rows]
+    dataset_metadata = dict.fromkeys(raw_files, [])
+    for i, n in enumerate(raw_files):
+        t0 = time.time()
+        with open(os.path.join(raw_data_dir,n), 'r') as temp_f:
+            col_count = [ len(l.split("|")) for l in temp_f.readlines() ]
+        rows = len(col_count)
+        max_c = max(col_count)
+        min_c = min(col_count)
+        t1 = time.time()
+        total_t = round(t1-t0)
+        dataset_metadata[n]=[min_c,max_c, rows, total_t]
+
+dataset_metadata
+
+test = data_load_meta(raw_files, raw_data_dir)
