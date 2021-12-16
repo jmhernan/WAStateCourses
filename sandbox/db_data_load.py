@@ -15,7 +15,8 @@ from sqlalchemy.engine import base
 from sqlalchemy.types import NVARCHAR, Integer, Text
 import csv
 
-root_dir = os.path.abspath(os.getcwd()) # parse this out so that it works 
+this_file_path = os.path.abspath(os.getcwd()) # parse this out so that it works
+root_dir = os.path.split(os.path.split(os.path.split(this_file_path)[0])[0])[0]
 raw_data_dir = os.path.join(root_dir, 
     'data/ccer_data_10_2021/cadrs_collaboration_data_2021_10_05/')
 project_root = os.path.join(root_dir, 'source/WAStateCourses')
@@ -49,7 +50,22 @@ def postgres_names(raw_name):
     table_name = lower_name.rsplit('.', 1)[0] 
     return table_name
 
-raw_files = [raw_files[5], raw_files[3]]
+# check names
+for i,n in enumerate(raw_files):
+    new_name = postgres_names(n)
+    print(new_name)
+
+# test reading in headers to make postgres compliant
+header_dict = dict.fromkeys(raw_files, [])
+for i, f in enumerate(raw_files):
+    with open(os.path.join(raw_data_dir,f), 'r') as temp_f:
+        reader = csv.reader(temp_f, delimiter='|')
+        header = next(reader) 
+        postgres_safe = [postgres_names(a) for a in header]
+        header_dict[f] = postgres_safe
+
+header_dict.keys()
+raw_files = [raw_files[0], raw_files[1]]
 load_metadata = dict.fromkeys(raw_files, [])
 
 for i,n in enumerate(raw_files):
@@ -62,6 +78,7 @@ for i,n in enumerate(raw_files):
         sep='|',
         quoting=csv.QUOTE_NONE,
         encoding='utf-8')
+    df.columns = header_dict.pop(n)
 
     t_load_1 = time.time()
     load_t = t_load_1-t_load_0
@@ -103,3 +120,8 @@ for i, n in enumerate(raw_files):
 dataset_metadata
 with open(os.path.join(root_dir,"data/data_column_meta.json"), "w") as outfile:
     json.dump(dataset_metadata, outfile)  
+
+        
+
+
+    
