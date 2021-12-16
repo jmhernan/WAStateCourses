@@ -20,7 +20,7 @@ raw_data_dir = os.path.join(root_dir,
     'data/ccer_data_10_2021/cadrs_collaboration_data_2021_10_05/')
 project_root = os.path.join(root_dir, 'source/WAStateCourses')
 
-raw_data_dir = '/Users/josehernandez/Documents/eScience/data/CCER_cadrs/ccer_data_10_2021/cadrs_collaboration_data_2021_10_05'
+# raw_data_dir = '/Users/josehernandez/Documents/eScience/data/CCER_cadrs/ccer_data_10_2021/cadrs_collaboration_data_2021_10_05'
 # WIP CHANGE NO TO CAPS!
 raw_files = [f for f in os.listdir(raw_data_dir) if \
     os.path.isfile(os.path.join(raw_data_dir, f))] 
@@ -50,7 +50,7 @@ def postgres_names(raw_name):
     return table_name
 
 raw_files = [raw_files[5], raw_files[3]]
-meta_dict = {}
+load_metadata = dict.fromkeys(raw_files, [])
 
 for i,n in enumerate(raw_files):
     print(i,n)
@@ -79,7 +79,11 @@ for i,n in enumerate(raw_files):
     )
     t_db_write_1 = time.time()
     db_write_t = t_db_write_1 - t_db_write_0
-    meta_dict[n] = [d_rows, load_t, db_write_t]
+    load_metadata[n] = [d_rows, load_t, db_write_t]
+
+load_metadata
+with open(os.path.join(root_dir,"data/load_meta.json"), "w") as outfile:
+    json.dump(dataset_metadata, outfile)  
 
 # WIP: test files and column names row errors
 #raw_files_test = raw_files[0],raw_files[3]
@@ -97,5 +101,5 @@ for i, n in enumerate(raw_files):
         dataset_metadata[n]=[min_c,max_c, rows, total_t]
 
 dataset_metadata
-
-test = data_load_meta(raw_files, raw_data_dir)
+with open(os.path.join(root_dir,"data/data_column_meta.json"), "w") as outfile:
+    json.dump(dataset_metadata, outfile)  
