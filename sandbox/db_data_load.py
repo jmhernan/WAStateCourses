@@ -15,7 +15,7 @@ from sqlalchemy.engine import base
 from sqlalchemy.types import NVARCHAR, Integer, Text
 import csv
 
-root_dir = os.path.abspath(os.getcwd())
+root_dir = os.path.abspath(os.getcwd()) # parse this out so that it works 
 raw_data_dir = os.path.join(root_dir, 
     'data/ccer_data_10_2021/cadrs_collaboration_data_2021_10_05/')
 project_root = os.path.join(root_dir, 'source/WAStateCourses')
