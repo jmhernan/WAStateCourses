@@ -65,7 +65,7 @@ for i, f in enumerate(raw_files):
         header_dict[f] = postgres_safe
 
 header_dict.keys()
-raw_files = [raw_files[0], raw_files[1]]
+#raw_files = [raw_files[0], raw_files[1]]
 load_metadata = dict.fromkeys(raw_files, [])
 
 for i,n in enumerate(raw_files):
@@ -100,7 +100,7 @@ for i,n in enumerate(raw_files):
 
 load_metadata
 with open(os.path.join(root_dir,"data/load_meta.json"), "w") as outfile:
-    json.dump(dataset_metadata, outfile)  
+    json.dump(load_metadata, outfile)  
 
 # WIP: test files and column names row errors
 #raw_files_test = raw_files[0],raw_files[3]
@@ -119,9 +119,5 @@ for i, n in enumerate(raw_files):
 
 dataset_metadata
 with open(os.path.join(root_dir,"data/data_column_meta.json"), "w") as outfile:
-    json.dump(dataset_metadata, outfile)  
-
+    json.dump(dataset_metadata, outfile) 
         
-
-
-    
