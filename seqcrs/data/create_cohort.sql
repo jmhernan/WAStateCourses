@@ -1,13 +1,13 @@
 DROP VIEW IF EXISTS enr_2017cohort;
-
 CREATE VIEW enr_2017cohort
 AS
 SELECT *
-FROM enrollments enr
-JOIN Dim_School sch
-    ON enr.SchoolCode = sch.SchoolCode
-    AND enr.ReportSchoolYear = sch.AcademicYear
-WHERE enr.GradeLevelSortOrder = 15 AND enr.GradReqYear = 2017 AND enr.dGraduate = 1 AND sch.dRoadMapRegionFlag = 1;
+FROM enrollments_patched enr
+JOIN dim_school_patched sch
+    ON enr.school_code = sch.school_code
+    AND enr.report_school_year = sch.academic_year
+WHERE enr.grade_level_sort_order = 15 AND enr.grad_req_year = 2017 AND enr.d_graduate = 1 AND sch.d_road_map_region_flag = 1;
+
 
 --select count(*) from enr_2017cohort;
 
