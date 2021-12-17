@@ -112,6 +112,7 @@ for i, n in enumerate(raw_files):
         total_t = round(t1-t0)
         dataset_metadata[n]=[min_c,max_c, rows, total_t]
 
+# For column process
 dataset_metadata
 with open(os.path.join(root_dir,"data/data_column_meta.json"), "w") as outfile:
     json.dump(dataset_metadata, outfile) 
