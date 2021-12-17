@@ -50,11 +50,6 @@ def postgres_names(raw_name):
     table_name = lower_name.rsplit('.', 1)[0] 
     return table_name
 
-# check names
-for i,n in enumerate(raw_files):
-    new_name = postgres_names(n)
-    print(new_name)
-
 # test reading in headers to make postgres compliant
 header_dict = dict.fromkeys(raw_files, [])
 for i, f in enumerate(raw_files):
@@ -120,4 +115,3 @@ for i, n in enumerate(raw_files):
 dataset_metadata
 with open(os.path.join(root_dir,"data/data_column_meta.json"), "w") as outfile:
     json.dump(dataset_metadata, outfile) 
-        
