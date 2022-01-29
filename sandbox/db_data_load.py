@@ -16,10 +16,8 @@ from sqlalchemy.types import NVARCHAR, Integer, Text
 import csv
 
 this_file_path = os.path.abspath(os.getcwd()) # parse this out so that it works
-root_dir = os.path.split(os.path.split(os.path.split(this_file_path)[0])[0])[0]
-raw_data_dir = os.path.join(root_dir, 
-    'data/ccer_data_10_2021/cadrs_collaboration_data_2021_10_05/')
-project_root = os.path.join(root_dir, 'source/WAStateCourses')
+project_root = os.path.split(this_file_path)[0]
+raw_data_dir = os.path.join(project_root, 'data/raw-data/')
 
 # raw_data_dir = '/Users/josehernandez/Documents/eScience/data/CCER_cadrs/ccer_data_10_2021/cadrs_collaboration_data_2021_10_05'
 # WIP CHANGE NO TO CAPS!
