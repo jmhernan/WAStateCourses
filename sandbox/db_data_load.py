@@ -92,7 +92,7 @@ for i,n in enumerate(raw_files):
     load_metadata[n] = [d_rows, load_t, db_write_t]
 
 load_metadata
-with open(os.path.join(root_dir,"data/load_meta.json"), "w") as outfile:
+with open(os.path.join(project_root,"data/load_meta.json"), "w") as outfile:
     json.dump(load_metadata, outfile)  
 
 # WIP: test files and column names row errors
@@ -112,5 +112,5 @@ for i, n in enumerate(raw_files):
 
 # For column process
 dataset_metadata
-with open(os.path.join(root_dir,"data/data_column_meta.json"), "w") as outfile:
+with open(os.path.join(project_root,"data/data_column_meta.json"), "w") as outfile:
     json.dump(dataset_metadata, outfile) 
