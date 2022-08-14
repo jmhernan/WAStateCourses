@@ -37,7 +37,8 @@ password = db_cred['password']
 engine = create_engine(f'postgresql://{user}:{password}@localhost/{db_name}',
     echo=False)
 
-
+from sqlalchemy import inspect
+inspector = inspect(engine)
 # Need to make names postgres friendly 
 def postgres_names(raw_name):
     pattern_1 = re.compile(r'(.)([A-Z][a-z]+)')
